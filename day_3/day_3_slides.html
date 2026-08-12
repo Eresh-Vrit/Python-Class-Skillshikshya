@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 3: Numbers &amp; Strings 🐍</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Fira+Code:wght@400;600&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    @page { size: A4 landscape; margin: 0; }
+    body { font-family: 'Poppins', 'Segoe UI', sans-serif; background: #e8e8e8; }
+    .slide { width: 297mm; height: 210mm; overflow: hidden; position: relative; display: flex; flex-direction: column; page-break-after: always; break-after: page; }
+    @media screen { .slide { margin: 20px auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); } }
+    .blob { position: absolute; border-radius: 50%; opacity: 0.15; pointer-events: none; }
+    .hero { background: linear-gradient(135deg, #0284c7 0%, #0d9488 60%, #059669 100%); color: white; justify-content: center; align-items: center; text-align: center; padding: 60px; }
+    .hero .blob1 { width: 280px; height: 280px; background: white; top: -80px; right: -60px; }
+    .hero .blob2 { width: 200px; height: 200px; background: #bae6fd; bottom: -60px; left: -40px; }
+    .section-intro { background: white; flex-direction: row; }
+    .section-intro .panel { width: 36%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px 28px; color: white; }
+    .section-intro .body { width: 64%; padding: 44px 52px; display: flex; flex-direction: column; justify-content: center; }
+    .content { background: white; padding: 48px 62px; }
+    .dark { background: #0f172a; color: #e2e8f0; padding: 46px 62px; }
+    .green  { background: linear-gradient(135deg, #059669, #10b981); }
+    .blue   { background: linear-gradient(135deg, #0284c7, #0ea5e9); }
+    .amber  { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .teal   { background: linear-gradient(135deg, #0d9488, #14b8a6); }
+    .violet { background: linear-gradient(135deg, #6d28d9, #8b5cf6); }
+    .purple { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .slide-tag { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; opacity: 0.7; margin-bottom: 10px; }
+    .slide-title { font-size: 52px; font-weight: 900; line-height: 1.1; }
+    .slide-subtitle { font-size: 22px; font-weight: 400; opacity: 0.85; margin-top: 14px; }
+    .section-emoji { font-size: 88px; line-height: 1; margin-bottom: 14px; }
+    .section-label { font-size: 19px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    h2 { font-size: 31px; font-weight: 800; color: #1e1b4b; margin-bottom: 20px; }
+    h3 { font-size: 20px; font-weight: 700; color: #1e1b4b; margin-bottom: 10px; }
+    .dark h2 { color: #e2e8f0; }
+    .dark h3 { color: #94a3b8; }
+    p { font-size: 16px; line-height: 1.65; color: #374151; }
+    .dark p { color: #cbd5e1; }
+    ul { list-style: none; margin-top: 6px; }
+    ul li { font-size: 16px; color: #374151; padding: 5px 0; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+    .dark ul li { color: #cbd5e1; }
+    ul li .icon { flex-shrink: 0; font-size: 17px; margin-top: 1px; }
+    pre { background: #0f172a; border-radius: 12px; padding: 18px 22px; font-family: 'Fira Code', 'Consolas', monospace; font-size: 14px; line-height: 1.75; color: #e2e8f0; overflow: hidden; }
+    .dark pre { background: #1e293b; }
+    pre .kw  { color: #c084fc; }
+    pre .fn  { color: #34d399; }
+    pre .st  { color: #fbbf24; }
+    pre .cm  { color: #4b5563; }
+    pre .nm  { color: #38bdf8; }
+    pre .op  { color: #f472b6; }
+    pre .var { color: #e2e8f0; }
+    pre .key { color: #fb923c; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .card { background: #f8fafc; border-radius: 14px; padding: 18px 22px; border-left: 5px solid #4f46e5; }
+    .card.green-border  { border-left-color: #059669; }
+    .card.blue-border   { border-left-color: #0284c7; }
+    .card.amber-border  { border-left-color: #d97706; }
+    .card.teal-border   { border-left-color: #0d9488; }
+    .card.violet-border { border-left-color: #6d28d9; }
+    .pill { display: inline-block; padding: 4px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .pill-green  { background: #d1fae5; color: #065f46; }
+    .pill-blue   { background: #dbeafe; color: #1e40af; }
+    .pill-amber  { background: #fef3c7; color: #92400e; }
+    .pill-teal   { background: #ccfbf1; color: #134e4a; }
+    .pill-violet { background: #ede9fe; color: #4c1d95; }
+    .highlight-box { background: #fef9c3; border: 2px solid #fde047; border-radius: 10px; padding: 12px 18px; font-size: 15px; color: #713f12; margin-top: 16px; font-weight: 600; }
+    .compare-row { display: flex; gap: 18px; margin-top: 14px; }
+    .compare-col { flex: 1; background: #f8fafc; border-radius: 12px; padding: 16px 20px; }
+    .compare-col.good { border-top: 4px solid #10b981; }
+    .compare-col.bad  { border-top: 4px solid #ef4444; }
+    .compare-col h4 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .compare-col.good h4 { color: #065f46; }
+    .compare-col.bad  h4 { color: #991b1b; }
+    .op-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-top: 14px; }
+    .op-cell { background: #f8fafc; border-radius: 10px; padding: 12px 10px; text-align: center; }
+    .op-cell .sym  { font-family: 'Fira Code', monospace; font-size: 20px; font-weight: 700; color: #4f46e5; }
+    .op-cell .desc { font-size: 11px; color: #6b7280; margin-top: 3px; }
+    .op-cell .ex   { font-family: 'Fira Code', monospace; font-size: 11px; color: #374151; margin-top: 5px; }
+    .page-num { position: absolute; bottom: 16px; right: 26px; font-size: 11px; font-weight: 600; opacity: 0.32; letter-spacing: 1px; }
+
+    /* ── Present mode ─── */
+    :root { --present-scale: 1; }
+    body.present-mode {
+      background: #111;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    body.present-mode::-webkit-scrollbar { display: none; }
+    body.present-mode .slide {
+      transform: scale(var(--present-scale));
+      transform-origin: top center;
+      margin: 0 auto calc(794px * (var(--present-scale) - 1) + 40px * var(--present-scale));
+      box-shadow: none;
+      border-radius: 0;
+    }
+    body.present-mode .page-num { display: none; }
+
+    .controls-hint {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-family: 'Poppins', sans-serif;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .controls-hint.show { opacity: 1; }
+    body.present-mode .controls-hint { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- SLIDE 1 — TITLE -->
+<div class="slide hero">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="slide-tag">Python Crash Course · Day 3</div>
+  <div class="slide-title">Numbers &amp; Strings</div>
+  <div class="slide-subtitle">Python as a calculator + working with text</div>
+  <div style="margin-top:30px; font-size:56px; line-height:1;">🔢</div>
+  <div style="margin-top:26px; font-size:12px; opacity:0.6; font-weight:600; letter-spacing:2px; text-transform:uppercase;">The two data types you'll use every single day</div>
+  <div class="page-num" style="color:rgba(255,255,255,0.45);">1 / 16</div>
+</div>
+
+<!-- SLIDE 2 — AGENDA -->
+<div class="slide content" style="padding:40px 58px;">
+  <h2 style="margin-bottom:14px;">Today's Roadmap 🗺️</h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:14px;">
+    <div class="card blue-border">
+      <div style="font-size:24px; margin-bottom:6px;">🔢</div>
+      <div style="font-weight:800; font-size:15px; color:#1e1b4b;">Integers &amp; Floats</div>
+      <div style="font-size:12px; color:#6b7280; margin-top:3px;">Whole numbers and decimals</div>
+    </div>
+    <div class="card amber-border">
+      <div style="font-size:24px; margin-bottom:6px;">➕</div>
+      <div style="font-weight:800; font-size:15px; color:#1e1b4b;">Arithmetic</div>
+      <div style="font-size:12px; color:#6b7280; margin-top:3px;">Python as a calculator</div>
+    </div>
+    <div class="card violet-border">
+      <div style="font-size:24px; margin-bottom:6px;">⚠️</div>
+      <div style="font-weight:800; font-size:15px; color:#1e1b4b;">int() with input()</div>
+      <div style="font-size:12px; color:#6b7280; margin-top:3px;">The #1 beginner trap</div>
+    </div>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+    <div class="card green-border">
+      <div style="font-size:24px; margin-bottom:6px;">🔤</div>
+      <div style="font-weight:800; font-size:15px; color:#1e1b4b;">Strings</div>
+      <div style="font-size:12px; color:#6b7280; margin-top:3px;">Text in Python</div>
+    </div>
+    <div class="card teal-border">
+      <div style="font-size:24px; margin-bottom:6px;">🔧</div>
+      <div style="font-weight:800; font-size:15px; color:#1e1b4b;">String Methods</div>
+      <div style="font-size:12px; color:#6b7280; margin-top:3px;">upper, lower, len and more</div>
+    </div>
+    <div class="card" style="border-left-color:#4f46e5;">
+      <div style="font-size:24px; margin-bottom:6px;">🔍</div>
+      <div style="font-weight:800; font-size:15px; color:#1e1b4b;">type()</div>
+      <div style="font-size:12px; color:#6b7280; margin-top:3px;">What kind of data is this?</div>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:14px; font-size:14px;">💡 Today's goal: use Python as a calculator and confidently work with text data.</div>
+  <div class="page-num">2 / 16</div>
+</div>
+
+<!-- SLIDE 3 — RECAP -->
+<div class="slide section-intro">
+  <div class="panel purple">
+    <div class="section-emoji">⏮️</div>
+    <div class="section-label">Quick Recap</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">Day 2 highlights</div>
+  </div>
+  <div class="body">
+    <h2>What We Already Know</h2>
+    <ul>
+      <li><span class="icon">🖨️</span><span><strong>print()</strong> — show something on screen</span></li>
+      <li><span class="icon">📦</span><span><strong>Variables</strong> — labelled boxes that store values</span></li>
+      <li><span class="icon">⌨️</span><span><strong>input()</strong> — ask the user to type something</span></li>
+      <li><span class="icon">✨</span><span><strong>f-strings</strong> — mix text and variables cleanly with <code style="background:#f3f4f6; padding:1px 6px; border-radius:4px; font-family:monospace;">f"Hello {name}"</code></span></li>
+      <li><span class="icon">💬</span><span><strong>Comments</strong> — notes in code that Python ignores</span></li>
+    </ul>
+    <div class="highlight-box">✅ All of that still applies today. We build on top of it!</div>
+  </div>
+  <div class="page-num">3 / 16</div>
+</div>
+
+<!-- SLIDE 4 — INTEGERS & FLOATS INTRO -->
+<div class="slide section-intro">
+  <div class="panel blue">
+    <div class="section-emoji">🔢</div>
+    <div class="section-label">Numbers</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">int &amp; float</div>
+  </div>
+  <div class="body">
+    <h2>Two Types of Numbers</h2>
+    <div class="grid-2" style="gap:16px; margin-bottom:14px;">
+      <div class="card blue-border" style="background:#eff6ff;">
+        <div style="font-weight:700; color:#0284c7; margin-bottom:8px; font-size:15px;">int — whole numbers</div>
+        <pre style="font-size:13px;"><span class="var">age</span>      <span class="op">=</span> <span class="nm">15</span>
+<span class="var">students</span> <span class="op">=</span> <span class="nm">28</span>
+<span class="var">score</span>    <span class="op">=</span> <span class="nm">-5</span>   <span class="cm"># negatives ok</span></pre>
+      </div>
+      <div class="card teal-border" style="background:#f0fdfa;">
+        <div style="font-weight:700; color:#0d9488; margin-bottom:8px; font-size:15px;">float — decimal numbers</div>
+        <pre style="font-size:13px;"><span class="var">price</span>  <span class="op">=</span> <span class="nm">9.99</span>
+<span class="var">height</span> <span class="op">=</span> <span class="nm">1.75</span>
+<span class="var">pi</span>     <span class="op">=</span> <span class="nm">3.14159</span></pre>
+      </div>
+    </div>
+    <div class="highlight-box" style="font-size:13.5px;">🔑 No quotes around numbers. <code style="background:#fde047;padding:0 4px;border-radius:3px;">15</code> is a number. <code style="background:#fde047;padding:0 4px;border-radius:3px;">"15"</code> is text. Very different!</div>
+  </div>
+  <div class="page-num">4 / 16</div>
+</div>
+
+<!-- SLIDE 5 — ARITHMETIC OPERATORS -->
+<div class="slide content" style="padding:40px 58px;">
+  <h2 style="margin-bottom:8px;">Python as a Calculator ➕</h2>
+  <div class="op-grid">
+    <div class="op-cell"><div class="sym">+</div><div class="desc">Add</div><div class="ex">10 + 3 = 13</div></div>
+    <div class="op-cell"><div class="sym">-</div><div class="desc">Subtract</div><div class="ex">10 - 3 = 7</div></div>
+    <div class="op-cell"><div class="sym">*</div><div class="desc">Multiply</div><div class="ex">10 * 3 = 30</div></div>
+    <div class="op-cell"><div class="sym">/</div><div class="desc">Divide (float)</div><div class="ex">10 / 3 = 3.33</div></div>
+    <div class="op-cell"><div class="sym">//</div><div class="desc">Floor divide</div><div class="ex">10 // 3 = 3</div></div>
+    <div class="op-cell"><div class="sym">%</div><div class="desc">Remainder</div><div class="ex">10 % 3 = 1</div></div>
+    <div class="op-cell"><div class="sym">**</div><div class="desc">Power</div><div class="ex">2 ** 8 = 256</div></div>
+    <div class="op-cell" style="background:#dbeafe;"><div class="sym" style="font-size:14px; color:#0284c7;">round()</div><div class="desc">Round</div><div class="ex">round(3.14159, 2)</div></div>
+  </div>
+  <pre style="margin-top:16px; font-size:13px;"><span class="var">price</span>    <span class="op">=</span> <span class="nm">250</span>
+<span class="var">quantity</span> <span class="op">=</span> <span class="nm">4</span>
+<span class="var">discount</span> <span class="op">=</span> <span class="nm">50</span>
+<span class="var">total</span>    <span class="op">=</span> <span class="var">price</span> <span class="op">*</span> <span class="var">quantity</span> <span class="op">-</span> <span class="var">discount</span>
+<span class="fn">print</span>(<span class="st">f"Total: Rs. </span><span style="color:#f472b6;">{</span><span style="color:#38bdf8;">total</span><span style="color:#f472b6;">}</span><span class="st">"</span>)   <span class="cm"># Rs. 950</span></pre>
+  <div class="page-num">5 / 16</div>
+</div>
+
+<!-- SLIDE 6 — INT() WITH INPUT() -->
+<div class="slide dark">
+  <h2 style="color:#fbbf24; margin-bottom:14px;">⚠️ The #1 Beginner Trap — input() Gives You Text</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <div style="font-size:11px; font-weight:700; color:#ef4444; letter-spacing:2px; margin-bottom:10px;">THE PROBLEM</div>
+      <pre><span class="var">age</span> <span class="op">=</span> <span class="fn">input</span>(<span class="st">"Enter your age: "</span>)
+<span class="cm"># User types: 15</span>
+<span class="cm"># BUT age = "15"  ← it's a STRING, not a number!</span>
+
+<span class="fn">print</span>(<span class="var">age</span> <span class="op">+</span> <span class="nm">10</span>)
+<span class="cm"># TypeError: can't add string and int</span>
+
+<span class="fn">print</span>(<span class="var">age</span> <span class="op">+</span> <span class="st">"10"</span>)
+<span class="cm"># "1510"  ← strings just join together!</span></pre>
+    </div>
+    <div>
+      <div style="font-size:11px; font-weight:700; color:#34d399; letter-spacing:2px; margin-bottom:10px;">THE FIX — WRAP WITH int()</div>
+      <pre><span class="cm"># Wrap input() with int() to convert to number</span>
+<span class="var">age</span> <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"Enter your age: "</span>))
+<span class="cm"># Now age = 15  ← a real integer</span>
+
+<span class="fn">print</span>(<span class="var">age</span> <span class="op">+</span> <span class="nm">10</span>)    <span class="cm"># 25 ✅</span>
+
+<span class="cm"># Use float() for decimal inputs</span>
+<span class="var">price</span> <span class="op">=</span> <span class="fn">float</span>(<span class="fn">input</span>(<span class="st">"Price: "</span>))
+<span class="fn">print</span>(<span class="var">price</span> <span class="op">*</span> <span class="nm">1.13</span>)  <span class="cm"># price with tax ✅</span></pre>
+      <div style="margin-top:12px; background:#1e293b; border-radius:10px; padding:11px 16px; font-size:13px; color:#fbbf24; font-weight:600; border-left:3px solid #fbbf24;">🧠 Rule: whenever you need to do maths with user input, wrap it with <code style="font-family:monospace;">int()</code> or <code style="font-family:monospace;">float()</code>.</div>
+    </div>
+  </div>
+  <div class="page-num">6 / 16</div>
+</div>
+
+<!-- SLIDE 7 — SHORTHAND OPERATORS -->
+<div class="slide content">
+  <h2>Shorthand Operators ⚡</h2>
+  <p style="margin-bottom:16px;">These are shortcuts for updating a variable using itself. You'll see them everywhere — especially in loops.</p>
+  <div class="grid-2" style="gap:22px; margin-top:8px;">
+    <div>
+      <pre><span class="cm"># Long way</span>
+<span class="var">score</span> <span class="op">=</span> <span class="var">score</span> <span class="op">+</span> <span class="nm">10</span>
+<span class="var">score</span> <span class="op">=</span> <span class="var">score</span> <span class="op">-</span> <span class="nm">5</span>
+<span class="var">score</span> <span class="op">=</span> <span class="var">score</span> <span class="op">*</span> <span class="nm">2</span>
+
+<span class="cm"># Short way — exactly the same result</span>
+<span class="var">score</span> <span class="op">+=</span> <span class="nm">10</span>   <span class="cm"># add 10 to score</span>
+<span class="var">score</span> <span class="op">-=</span> <span class="nm">5</span>    <span class="cm"># subtract 5</span>
+<span class="var">score</span> <span class="op">*=</span> <span class="nm">2</span>    <span class="cm"># multiply by 2</span></pre>
+    </div>
+    <div>
+      <pre><span class="cm"># Real example — a simple counter</span>
+<span class="var">count</span> <span class="op">=</span> <span class="nm">0</span>
+<span class="var">count</span> <span class="op">+=</span> <span class="nm">1</span>   <span class="cm"># count = 1</span>
+<span class="var">count</span> <span class="op">+=</span> <span class="nm">1</span>   <span class="cm"># count = 2</span>
+<span class="var">count</span> <span class="op">+=</span> <span class="nm">1</span>   <span class="cm"># count = 3</span>
+<span class="fn">print</span>(<span class="var">count</span>)  <span class="cm"># 3</span>
+
+<span class="cm"># Running total</span>
+<span class="var">total</span> <span class="op">=</span> <span class="nm">0</span>
+<span class="var">total</span> <span class="op">+=</span> <span class="nm">120</span>  <span class="cm"># total = 120</span>
+<span class="var">total</span> <span class="op">+=</span> <span class="nm">350</span>  <span class="cm"># total = 470</span>
+<span class="fn">print</span>(<span class="st">f"Total: Rs. </span><span style="color:#f472b6;">{</span><span style="color:#38bdf8;">total</span><span style="color:#f472b6;">}</span><span class="st">"</span>)</pre>
+    </div>
+  </div>
+  <div class="highlight-box" style="font-size:13.5px;">💡 <code style="background:#fde047; padding:0 4px; border-radius:3px;">+=</code> is by far the most used shorthand. You'll use it constantly in loops next week!</div>
+  <div class="page-num">7 / 16</div>
+</div>
+
+<!-- SLIDE 8 — STRINGS SECTION INTRO -->
+<div class="slide section-intro">
+  <div class="panel green">
+    <div class="section-emoji">🔤</div>
+    <div class="section-label">Strings</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">Type: str — working with text</div>
+  </div>
+  <div class="body">
+    <h2>Strings — Text in Python</h2>
+    <p style="margin-bottom:14px;">A <strong>string</strong> is any text inside quote marks — letters, words, sentences, emoji, anything!</p>
+    <pre><span class="cm"># Single or double quotes — both work</span>
+<span class="var">greeting</span> <span class="op">=</span> <span class="st">"Hello, World!"</span>
+<span class="var">city</span>     <span class="op">=</span> <span class="st">'Kathmandu'</span>
+<span class="var">mood</span>     <span class="op">=</span> <span class="st">"Python is 🔥"</span>
+
+<span class="cm"># + joins strings, * repeats them</span>
+<span class="fn">print</span>(<span class="st">"Hello, "</span> <span class="op">+</span> <span class="st">"world!"</span>)   <span class="cm"># Hello, world!</span>
+<span class="fn">print</span>(<span class="st">"⭐"</span> <span class="op">*</span> <span class="nm">15</span>)               <span class="cm"># ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐</span></pre>
+    <div class="highlight-box" style="font-size:13px; margin-top:12px;">⚠️ A number in quotes is still a string: <code style="background:#fde047;padding:0 4px;border-radius:3px;">"42"</code> ≠ <code style="background:#fde047;padding:0 4px;border-radius:3px;">42</code> — one is text, one is a number!</div>
+  </div>
+  <div class="page-num">8 / 16</div>
+</div>
+
+<!-- SLIDE 9 — STRING METHODS -->
+<div class="slide content">
+  <h2>String Methods — Built-in Superpowers 🔧</h2>
+  <div class="grid-2" style="gap:22px; margin-top:8px;">
+    <div>
+      <h3 style="margin-bottom:12px;">Case &amp; length</h3>
+      <pre><span class="var">word</span> <span class="op">=</span> <span class="st">"python"</span>
+
+<span class="var">word</span><span class="op">.</span><span class="fn">upper</span>()    <span class="cm"># "PYTHON"</span>
+<span class="var">word</span><span class="op">.</span><span class="fn">lower</span>()    <span class="cm"># "python"</span>
+<span class="var">word</span><span class="op">.</span><span class="fn">title</span>()    <span class="cm"># "Python"</span>
+<span class="fn">len</span>(<span class="var">word</span>)       <span class="cm"># 6</span>
+
+<span class="var">name</span> <span class="op">=</span> <span class="fn">input</span>(<span class="st">"Name: "</span>)<span class="op">.</span><span class="fn">strip</span>()
+<span class="cm"># .strip() removes accidental spaces</span></pre>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px;">Checking &amp; replacing</h3>
+      <pre><span class="var">sentence</span> <span class="op">=</span> <span class="st">"Hello World"</span>
+
+<span class="var">sentence</span><span class="op">.</span><span class="fn">startswith</span>(<span class="st">"Hello"</span>)  <span class="cm"># True</span>
+<span class="var">sentence</span><span class="op">.</span><span class="fn">endswith</span>(<span class="st">"World"</span>)    <span class="cm"># True</span>
+<span class="var">sentence</span><span class="op">.</span><span class="fn">replace</span>(<span class="st">"World"</span><span class="op">,</span> <span class="st">"Python"</span>)
+<span class="cm"># "Hello Python"</span>
+
+<span class="st">"hello"</span> <span class="kw">in</span> <span class="var">sentence</span>  <span class="cm"># False (case-sensitive!)</span>
+<span class="st">"Hello"</span> <span class="kw">in</span> <span class="var">sentence</span>  <span class="cm"># True</span></pre>
+    </div>
+  </div>
+  <div style="margin-top:14px; background:#f0fdf4; border-radius:10px; padding:12px 18px; font-size:14px; color:#065f46; font-weight:600; border-left:4px solid #059669;">🚀 Methods are called with a dot: <code style="background:#a7f3d0; padding:0 4px; border-radius:3px;">variable.method()</code> — the dot is key!</div>
+  <div class="page-num">9 / 16</div>
+</div>
+
+<!-- SLIDE 10 — STRING INDEXING -->
+<div class="slide dark">
+  <h2 style="color:#34d399; margin-bottom:14px;">String Indexing — Picking Individual Letters 🔤</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <p style="margin-bottom:14px;">Every character in a string has a position number called an <strong>index</strong>. Counting starts at <strong>0</strong>, not 1.</p>
+      <div style="background:#1e293b; border-radius:12px; padding:14px 18px; margin-bottom:14px;">
+        <div style="font-family:'Fira Code',monospace; font-size:13px; text-align:center; margin-bottom:10px; color:#94a3b8;">word = "Python"</div>
+        <div style="display:flex; gap:0;">
+          <div style="flex:1; text-align:center; border:1px solid #334155; padding:8px 4px; background:#0f172a;"><div style="color:#fbbf24; font-size:14px; font-weight:700;">P</div><div style="color:#4f46e5; font-size:11px; margin-top:4px;">0</div></div>
+          <div style="flex:1; text-align:center; border:1px solid #334155; padding:8px 4px; background:#0f172a;"><div style="color:#fbbf24; font-size:14px; font-weight:700;">y</div><div style="color:#4f46e5; font-size:11px; margin-top:4px;">1</div></div>
+          <div style="flex:1; text-align:center; border:1px solid #334155; padding:8px 4px; background:#0f172a;"><div style="color:#fbbf24; font-size:14px; font-weight:700;">t</div><div style="color:#4f46e5; font-size:11px; margin-top:4px;">2</div></div>
+          <div style="flex:1; text-align:center; border:1px solid #334155; padding:8px 4px; background:#0f172a;"><div style="color:#fbbf24; font-size:14px; font-weight:700;">h</div><div style="color:#4f46e5; font-size:11px; margin-top:4px;">3</div></div>
+          <div style="flex:1; text-align:center; border:1px solid #334155; padding:8px 4px; background:#0f172a;"><div style="color:#fbbf24; font-size:14px; font-weight:700;">o</div><div style="color:#4f46e5; font-size:11px; margin-top:4px;">4</div></div>
+          <div style="flex:1; text-align:center; border:1px solid #334155; padding:8px 4px; background:#0f172a;"><div style="color:#fbbf24; font-size:14px; font-weight:700;">n</div><div style="color:#4f46e5; font-size:11px; margin-top:4px;">5</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <pre><span class="var">word</span> <span class="op">=</span> <span class="st">"Python"</span>
+
+<span class="var">word</span><span class="op">[</span><span class="nm">0</span><span class="op">]</span>    <span class="cm"># "P"  ← first character</span>
+<span class="var">word</span><span class="op">[</span><span class="nm">1</span><span class="op">]</span>    <span class="cm"># "y"</span>
+<span class="var">word</span><span class="op">[-</span><span class="nm">1</span><span class="op">]</span>   <span class="cm"># "n"  ← last character</span>
+<span class="var">word</span><span class="op">[-</span><span class="nm">2</span><span class="op">]</span>   <span class="cm"># "o"  ← second to last</span>
+
+<span class="cm"># Slicing — grab a chunk</span>
+<span class="var">word</span><span class="op">[</span><span class="nm">0</span><span class="op">:</span><span class="nm">3</span><span class="op">]</span>  <span class="cm"># "Pyt"  (0, 1, 2 — stop before 3)</span>
+<span class="var">word</span><span class="op">[</span><span class="nm">2</span><span class="op">:</span><span class="op">]</span>   <span class="cm"># "thon" (2 to end)</span></pre>
+      <div style="margin-top:12px; background:#1e293b; border-radius:10px; padding:10px 14px; font-size:13px; color:#fbbf24; font-weight:600; border-left:3px solid #fbbf24;">🧠 Indexing starts at 0. The last item is always [-1]. Remember this — it's the same for lists too!</div>
+    </div>
+  </div>
+  <div class="page-num">10 / 16</div>
+</div>
+
+<!-- SLIDE 11 — TYPE() -->
+<div class="slide content">
+  <h2>type() — What Kind of Data Is This? 🔍</h2>
+  <div class="grid-2" style="gap:22px; margin-top:8px;">
+    <div>
+      <p style="margin-bottom:14px;"><code style="font-family:monospace; background:#f3f4f6; padding:2px 6px; border-radius:4px;">type()</code> tells you exactly what kind of data you're dealing with. Very useful when debugging.</p>
+      <pre><span class="fn">print</span>(<span class="fn">type</span>(<span class="st">"Hello"</span>))   <span class="cm"># &lt;class 'str'&gt;</span>
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="nm">42</span>))        <span class="cm"># &lt;class 'int'&gt;</span>
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="nm">3.14</span>))      <span class="cm"># &lt;class 'float'&gt;</span>
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="nm">True</span>))      <span class="cm"># &lt;class 'bool'&gt;</span>
+
+<span class="var">age</span> <span class="op">=</span> <span class="fn">input</span>(<span class="st">"Age: "</span>)
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="var">age</span>))       <span class="cm"># &lt;class 'str'&gt; ← always!</span></pre>
+    </div>
+    <div>
+      <h3>Type Conversion</h3>
+      <pre><span class="fn">int</span>(<span class="st">"100"</span>)      <span class="cm"># str → int   : 100</span>
+<span class="fn">float</span>(<span class="st">"3.14"</span>)  <span class="cm"># str → float : 3.14</span>
+<span class="fn">str</span>(<span class="nm">42</span>)         <span class="cm"># int → str   : "42"</span>
+
+<span class="cm"># The classic fix pattern:</span>
+<span class="var">age</span> <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"Your age: "</span>))
+<span class="fn">print</span>(<span class="st">f"Next year: </span><span style="color:#f472b6;">{</span><span style="color:#38bdf8;">age</span> <span class="op">+</span> <span class="nm">1</span><span style="color:#f472b6;">}</span><span class="st">"</span>)</pre>
+      <div class="highlight-box" style="font-size:13px; margin-top:12px;">🔑 Use <code style="background:#fde047;padding:0 4px;border-radius:3px;">type()</code> whenever you're confused about why your code isn't working. It's your first debugging tool!</div>
+    </div>
+  </div>
+  <div class="page-num">11 / 16</div>
+</div>
+
+<!-- SLIDE 12 — BOOLEANS (brief) -->
+<div class="slide section-intro">
+  <div class="panel amber">
+    <div class="section-emoji">✅</div>
+    <div class="section-label">Booleans</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">True or False — that's it</div>
+  </div>
+  <div class="body">
+    <h2>Booleans — Two Values Only</h2>
+    <p style="margin-bottom:14px;">A boolean can only be <code style="font-family:monospace; background:#f3f4f6; padding:2px 6px; border-radius:4px;">True</code> or <code style="font-family:monospace; background:#f3f4f6; padding:2px 6px; border-radius:4px;">False</code>. They power every decision your program makes (more on that tomorrow!).</p>
+    <pre><span class="cm"># Direct assignment</span>
+<span class="var">is_raining</span>    <span class="op">=</span> <span class="nm">False</span>
+<span class="var">has_homework</span>  <span class="op">=</span> <span class="nm">True</span>
+
+<span class="cm"># Comparison operators produce booleans</span>
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">==</span> <span class="nm">10</span>)   <span class="cm"># True  — equal to</span>
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">!=</span> <span class="nm">5</span>)    <span class="cm"># True  — not equal</span>
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">&gt;</span>  <span class="nm">20</span>)   <span class="cm"># False — greater than</span>
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">&lt;=</span> <span class="nm">10</span>)   <span class="cm"># True  — less or equal</span></pre>
+    <div class="highlight-box" style="font-size:13px; margin-top:12px;">🧠 <code style="background:#fde047;padding:0 4px;border-radius:3px;">==</code> checks if two things are equal. <code style="background:#fde047;padding:0 4px;border-radius:3px;">=</code> stores a value. Completely different — don't mix them up!</div>
+  </div>
+  <div class="page-num">12 / 16</div>
+</div>
+
+<!-- SLIDE 13 — CHEAT SHEET -->
+<div class="slide content" style="padding:36px 52px;">
+  <h2 style="margin-bottom:14px;">Today's Cheat Sheet 📋</h2>
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; font-size:13px;">
+    <div>
+      <div style="font-size:11px; font-weight:800; color:#0284c7; letter-spacing:2px; margin-bottom:8px; text-transform:uppercase;">Numbers</div>
+      <pre style="font-size:12px;"><span class="var">x</span> <span class="op">=</span> <span class="nm">42</span>       <span class="cm"># int</span>
+<span class="var">y</span> <span class="op">=</span> <span class="nm">3.14</span>     <span class="cm"># float</span>
+<span class="op">+  -  *  /</span>
+<span class="op">//  %  **</span>
+<span class="var">x</span> <span class="op">+=</span> <span class="nm">10</span>      <span class="cm"># shorthand</span></pre>
+    </div>
+    <div>
+      <div style="font-size:11px; font-weight:800; color:#059669; letter-spacing:2px; margin-bottom:8px; text-transform:uppercase;">Strings</div>
+      <pre style="font-size:12px;"><span class="var">s</span> <span class="op">=</span> <span class="st">"hello"</span>
+<span class="var">s</span><span class="op">.</span><span class="fn">upper</span>() <span class="op">.</span><span class="fn">lower</span>()
+<span class="var">s</span><span class="op">.</span><span class="fn">strip</span>() <span class="op">.</span><span class="fn">replace</span>()
+<span class="fn">len</span>(<span class="var">s</span>)
+<span class="var">s</span><span class="op">[</span><span class="nm">0</span><span class="op">]</span>  <span class="var">s</span><span class="op">[-</span><span class="nm">1</span><span class="op">]</span>  <span class="var">s</span><span class="op">[</span><span class="nm">0</span><span class="op">:</span><span class="nm">3</span><span class="op">]</span></pre>
+    </div>
+    <div>
+      <div style="font-size:11px; font-weight:800; color:#d97706; letter-spacing:2px; margin-bottom:8px; text-transform:uppercase;">Type Tools</div>
+      <pre style="font-size:12px;"><span class="fn">type</span>(<span class="var">x</span>)
+<span class="fn">int</span>(<span class="st">"42"</span>)
+<span class="fn">float</span>(<span class="st">"3.14"</span>)
+<span class="fn">str</span>(<span class="nm">99</span>)
+<span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"..."</span>))</pre>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:14px; font-size:14px;">🔑 The golden rule: <strong>input() always gives text</strong>. If you need a number, wrap it: <code style="background:#fde047; padding:0 4px; border-radius:3px;">int(input("..."))</code></div>
+  <div class="page-num">13 / 16</div>
+</div>
+
+<!-- SLIDE 14 — CODING SESSION -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:12px;">Today's Coding Session 💻</h2>
+  <p style="margin-bottom:14px; font-size:15px;">Open your <code style="background:#f3f4f6; padding:2px 8px; border-radius:6px; font-family:monospace;">day_3</code> folder. We work through these together.</p>
+  <div style="display:flex; flex-direction:column; gap:9px;">
+    <div style="display:flex; align-items:center; gap:16px; background:#eff6ff; border-radius:12px; padding:12px 20px; border-left:4px solid #0284c7;">
+      <div style="font-size:22px;">🔢</div>
+      <div style="flex:1;"><div style="font-weight:700; color:#0284c7; font-size:14px;">03_numbers.py</div><div style="font-size:12px; color:#6b7280;">Calculator: ask two numbers, print sum / diff / product / quotient</div></div>
+      <span class="pill pill-blue">10 min</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px; background:#fffbeb; border-radius:12px; padding:12px 20px; border-left:4px solid #d97706;">
+      <div style="font-size:22px;">🧾</div>
+      <div style="flex:1;"><div style="font-weight:700; color:#d97706; font-size:14px;">Shopping Receipt</div><div style="font-size:12px; color:#6b7280;">Ask price + quantity. Calculate total, add 13% tax, print receipt using f-strings</div></div>
+      <span class="pill pill-amber">12 min</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px; background:#f0fdf4; border-radius:12px; padding:12px 20px; border-left:4px solid #059669;">
+      <div style="font-size:22px;">🔤</div>
+      <div style="flex:1;"><div style="font-weight:700; color:#059669; font-size:14px;">02_strings.py</div><div style="font-size:12px; color:#6b7280;">String transformer: ask for a word, print it in upper, lower, title, reversed, and its length</div></div>
+      <span class="pill pill-green">10 min</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px; background:#fffbeb; border-radius:12px; padding:12px 20px; border-left:4px solid #d97706;">
+      <div style="font-size:22px;">✅</div>
+      <div style="flex:1;"><div style="font-weight:700; color:#d97706; font-size:14px;">04_booleans.py</div><div style="font-size:12px; color:#6b7280;">Comparison explorer: print results of ==, !=, &gt;, &lt;, &gt;=, &lt;= on different values</div></div>
+      <span class="pill pill-amber">8 min</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px; background:#fef2f2; border-radius:12px; padding:12px 20px; border-left:4px solid #be185d;">
+      <div style="font-size:22px;">🌶️</div>
+      <div style="flex:1;"><div style="font-weight:700; color:#be185d; font-size:14px;">Bonus — Age calculator</div><div style="font-size:12px; color:#6b7280;">Ask birth year, calculate age, print how many years until 100</div></div>
+      <span class="pill" style="background:#ffe4e6; color:#9f1239;">if time</span>
+    </div>
+  </div>
+  <div class="page-num">14 / 16</div>
+</div>
+
+<!-- SLIDE 15 — COMMON MISTAKES -->
+<div class="slide content" style="padding:40px 58px;">
+  <h2 style="margin-bottom:16px;">Common Mistakes Today ⚠️</h2>
+  <div style="display:flex; flex-direction:column; gap:12px;">
+    <div style="background:#fef2f2; border-radius:12px; padding:14px 20px; border-left:5px solid #ef4444;">
+      <div style="font-size:13px; font-weight:700; color:#991b1b; margin-bottom:6px;">❌ Forgetting int() with input()</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:13px; font-family:'Fira Code',monospace;">
+        <div style="background:#fff1f2; padding:8px 12px; border-radius:6px; color:#991b1b;">age = input("Age: ")<br>print(age + 10)  ← TypeError</div>
+        <div style="background:#f0fdf4; padding:8px 12px; border-radius:6px; color:#065f46;">age = int(input("Age: "))<br>print(age + 10)  ← ✅ works</div>
+      </div>
+    </div>
+    <div style="background:#fef2f2; border-radius:12px; padding:14px 20px; border-left:5px solid #ef4444;">
+      <div style="font-size:13px; font-weight:700; color:#991b1b; margin-bottom:6px;">❌ Mixing strings and numbers with +</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:13px; font-family:'Fira Code',monospace;">
+        <div style="background:#fff1f2; padding:8px 12px; border-radius:6px; color:#991b1b;">"Age: " + 15  ← TypeError</div>
+        <div style="background:#f0fdf4; padding:8px 12px; border-radius:6px; color:#065f46;">f"Age: {15}"  ← ✅ use f-string</div>
+      </div>
+    </div>
+    <div style="background:#fef2f2; border-radius:12px; padding:14px 20px; border-left:5px solid #ef4444;">
+      <div style="font-size:13px; font-weight:700; color:#991b1b; margin-bottom:6px;">❌ Using = instead of == to compare</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:13px; font-family:'Fira Code',monospace;">
+        <div style="background:#fff1f2; padding:8px 12px; border-radius:6px; color:#991b1b;">if score = 100:  ← SyntaxError</div>
+        <div style="background:#f0fdf4; padding:8px 12px; border-radius:6px; color:#065f46;">if score == 100:  ← ✅ correct</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-num">15 / 16</div>
+</div>
+
+<!-- SLIDE 16 — CLOSING -->
+<div class="slide hero" style="background: linear-gradient(135deg, #0284c7 0%, #0d9488 50%, #059669 100%);">
+  <div class="blob blob1" style="background:#bae6fd;"></div>
+  <div class="blob blob2" style="background:#a7f3d0;"></div>
+  <div style="font-size:72px; line-height:1; margin-bottom:18px;">🚀</div>
+  <div class="slide-title" style="font-size:52px;">Day 3 done!</div>
+  <div class="slide-subtitle">You can now use Python as a calculator and work with text.</div>
+  <div style="margin-top:28px; display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+    <div style="background:rgba(255,255,255,0.18); border-radius:10px; padding:10px 18px; font-size:14px; font-weight:700;">🔢 int &amp; float</div>
+    <div style="background:rgba(255,255,255,0.18); border-radius:10px; padding:10px 18px; font-size:14px; font-weight:700;">➕ arithmetic</div>
+    <div style="background:rgba(255,255,255,0.18); border-radius:10px; padding:10px 18px; font-size:14px; font-weight:700;">⚠️ int(input())</div>
+    <div style="background:rgba(255,255,255,0.18); border-radius:10px; padding:10px 18px; font-size:14px; font-weight:700;">🔤 string methods</div>
+    <div style="background:rgba(255,255,255,0.18); border-radius:10px; padding:10px 18px; font-size:14px; font-weight:700;">🔍 type()</div>
+    <div style="background:rgba(255,255,255,0.18); border-radius:10px; padding:10px 18px; font-size:14px; font-weight:700;">✅ booleans</div>
+  </div>
+  <div style="margin-top:26px; font-size:15px; opacity:0.9; font-weight:600; max-width:600px; line-height:1.6;">Tomorrow: if, elif, else — your programs start making decisions! 🔀</div>
+  <div class="page-num" style="color:rgba(255,255,255,0.45);">16 / 16</div>
+</div>
+
+<script>
+(function() {
+  const SLIDE_W = 1122;
+  const SLIDE_H = 794;
+  let presentMode = false;
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  let currentSlide = 0;
+
+  function updateScale() {
+    if (!presentMode) return;
+    const scale = Math.min(window.innerWidth / SLIDE_W, window.innerHeight / SLIDE_H);
+    document.documentElement.style.setProperty('--present-scale', scale);
+  }
+
+  function togglePresent() {
+    presentMode = !presentMode;
+    document.body.classList.toggle('present-mode', presentMode);
+    updateScale();
+    if (presentMode && slides[currentSlide]) {
+      slides[currentSlide].scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+  }
+
+  function scrollToSlide(index) {
+    if (index >= 0 && index < slides.length) {
+      slides[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      currentSlide = index;
+    }
+  }
+
+  window.addEventListener('resize', updateScale);
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (e.key === 'f' || e.key === 'F') {
+      e.preventDefault();
+      togglePresent();
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      scrollToSlide(currentSlide + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      scrollToSlide(currentSlide - 1);
+    }
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        currentSlide = slides.indexOf(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  slides.forEach(slide => observer.observe(slide));
+
+  const hint = document.createElement('div');
+  hint.className = 'controls-hint show';
+  hint.textContent = "Press 'F' for fullscreen mode • Arrow keys to navigate";
+  document.body.appendChild(hint);
+  setTimeout(() => hint.classList.remove('show'), 6000);
+})();
+</script>
+</body>
+</html>

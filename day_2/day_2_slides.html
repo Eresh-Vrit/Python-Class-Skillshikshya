@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 2: Hello, Python 🐍</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Fira+Code:wght@400;600&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    @page { size: A4 landscape; margin: 0; }
+    body { font-family: 'Poppins', 'Segoe UI', sans-serif; background: #e8e8e8; }
+    .slide { width: 297mm; height: 210mm; overflow: hidden; position: relative; display: flex; flex-direction: column; page-break-after: always; break-after: page; }
+    @media screen { .slide { margin: 20px auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); } }
+    .blob { position: absolute; border-radius: 50%; opacity: 0.15; pointer-events: none; }
+    .hero { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #a855f7 100%); color: white; justify-content: center; align-items: center; text-align: center; padding: 60px; }
+    .hero .blob1 { width: 280px; height: 280px; background: white; top: -80px; right: -60px; }
+    .hero .blob2 { width: 200px; height: 200px; background: #c4b5fd; bottom: -60px; left: -40px; }
+    .section-intro { background: white; flex-direction: row; }
+    .section-intro .panel { width: 36%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px 28px; color: white; }
+    .section-intro .body { width: 64%; padding: 44px 52px; display: flex; flex-direction: column; justify-content: center; }
+    .content { background: white; padding: 48px 62px; }
+    .dark { background: #0f172a; color: #e2e8f0; padding: 46px 62px; }
+    .purple { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .green  { background: linear-gradient(135deg, #059669, #10b981); }
+    .blue   { background: linear-gradient(135deg, #0284c7, #0ea5e9); }
+    .amber  { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .teal   { background: linear-gradient(135deg, #0d9488, #14b8a6); }
+    .violet { background: linear-gradient(135deg, #6d28d9, #8b5cf6); }
+    .rose   { background: linear-gradient(135deg, #be185d, #e11d48); }
+    .slide-tag { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; opacity: 0.7; margin-bottom: 10px; }
+    .slide-title { font-size: 52px; font-weight: 900; line-height: 1.1; }
+    .slide-subtitle { font-size: 22px; font-weight: 400; opacity: 0.85; margin-top: 14px; }
+    .section-emoji { font-size: 88px; line-height: 1; margin-bottom: 14px; }
+    .section-label { font-size: 19px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    h2 { font-size: 31px; font-weight: 800; color: #1e1b4b; margin-bottom: 20px; }
+    h3 { font-size: 20px; font-weight: 700; color: #1e1b4b; margin-bottom: 10px; }
+    .dark h2 { color: #e2e8f0; }
+    .dark h3 { color: #94a3b8; }
+    p { font-size: 16px; line-height: 1.65; color: #374151; }
+    .dark p { color: #cbd5e1; }
+    ul { list-style: none; margin-top: 6px; }
+    ul li { font-size: 16px; color: #374151; padding: 5px 0; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+    .dark ul li { color: #cbd5e1; }
+    ul li .icon { flex-shrink: 0; font-size: 17px; margin-top: 1px; }
+    pre { background: #0f172a; border-radius: 12px; padding: 18px 22px; font-family: 'Fira Code', 'Consolas', monospace; font-size: 14px; line-height: 1.75; color: #e2e8f0; overflow: hidden; }
+    .dark pre { background: #1e293b; }
+    pre .kw  { color: #c084fc; }
+    pre .fn  { color: #34d399; }
+    pre .st  { color: #fbbf24; }
+    pre .cm  { color: #4b5563; }
+    pre .nm  { color: #38bdf8; }
+    pre .op  { color: #f472b6; }
+    pre .var { color: #e2e8f0; }
+    pre .key { color: #fb923c; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .card { background: #f8fafc; border-radius: 14px; padding: 18px 22px; border-left: 5px solid #4f46e5; }
+    .card.green-border  { border-left-color: #059669; }
+    .card.blue-border   { border-left-color: #0284c7; }
+    .card.amber-border  { border-left-color: #d97706; }
+    .card.teal-border   { border-left-color: #0d9488; }
+    .card.violet-border { border-left-color: #6d28d9; }
+    .card.rose-border   { border-left-color: #be185d; }
+    .pill { display: inline-block; padding: 4px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .pill-purple { background: #ede9fe; color: #5b21b6; }
+    .pill-green  { background: #d1fae5; color: #065f46; }
+    .pill-blue   { background: #dbeafe; color: #1e40af; }
+    .pill-amber  { background: #fef3c7; color: #92400e; }
+    .highlight-box { background: #fef9c3; border: 2px solid #fde047; border-radius: 10px; padding: 12px 18px; font-size: 15px; color: #713f12; margin-top: 16px; font-weight: 600; }
+    .analogy { background: #ecfeff; border: 2px solid #67e8f9; border-radius: 12px; padding: 14px 18px; font-size: 14px; color: #155e75; margin-top: 14px; font-weight: 500; line-height: 1.6; }
+    .analogy strong { color: #0e7490; }
+    .compare-row { display: flex; gap: 18px; margin-top: 14px; }
+    .compare-col { flex: 1; background: #f8fafc; border-radius: 12px; padding: 16px 20px; }
+    .compare-col.good { border-top: 4px solid #10b981; }
+    .compare-col.bad  { border-top: 4px solid #ef4444; }
+    .compare-col h4 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .compare-col.good h4 { color: #065f46; }
+    .compare-col.bad  h4 { color: #991b1b; }
+    .page-num { position: absolute; bottom: 16px; right: 26px; font-size: 11px; font-weight: 600; opacity: 0.32; letter-spacing: 1px; }
+    /* ── Present mode ─── */
+    :root { --present-scale: 1; }
+    body.present-mode {
+      background: #111;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    body.present-mode::-webkit-scrollbar { display: none; }
+    body.present-mode .slide {
+      transform: scale(var(--present-scale));
+      transform-origin: top center;
+      margin: 0 auto calc(794px * (var(--present-scale) - 1) + 40px * var(--present-scale));
+      box-shadow: none;
+      border-radius: 0;
+    }
+    body.present-mode .page-num { display: none; }
+
+    .controls-hint {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-family: 'Poppins', sans-serif;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .controls-hint.show { opacity: 1; }
+    body.present-mode .controls-hint { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- SLIDE 1 — TITLE -->
+<div class="slide hero">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="slide-tag">Python Crash Course · Day 2</div>
+  <div class="slide-title">Hello, Python!</div>
+  <div class="slide-subtitle">Your very first program — written and run today</div>
+  <div style="margin-top:30px; font-size:56px; line-height:1;">🐍</div>
+  <div style="margin-top:26px; font-size:12px; opacity:0.6; font-weight:600; letter-spacing:2px; text-transform:uppercase;">We write real code from minute one</div>
+  <div class="page-num" style="color:rgba(255,255,255,0.45);">1 / 14</div>
+</div>
+
+<!-- SLIDE 2 — AGENDA -->
+<div class="slide content" style="padding:40px 58px;">
+  <h2 style="margin-bottom:14px;">Today's Roadmap 🗺️</h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:16px;">
+    <div class="card" style="border-left-color:#4f46e5;">
+      <div style="font-size:24px; margin-bottom:6px;">💡</div>
+      <div style="font-weight:800; font-size:15px; color:#1e1b4b;">What is Python?</div>
+      <div style="font-size:12px; color:#6b7280; margin-top:3px;">2 minutes of context</div>
+    </div>
+    <div class="card green-border">
+      <div style="font-size:24px; margin-bottom:6px;">🖨️</div>
+      <div style="font-weight:800; font-size:15px; color:#1e1b4b;">print()</div>
+      <div style="font-size:12px; color:#6b7280; margin-top:3px;">Show things on screen</div>
+    </div>
+    <div class="card blue-border">
+      <div style="font-size:24px; margin-bottom:6px;">📦</div>
+      <div style="font-weight:800; font-size:15px; color:#1e1b4b;">Variables</div>
+      <div style="font-size:12px; color:#6b7280; margin-top:3px;">Store and reuse values</div>
+    </div>
+    <div class="card amber-border">
+      <div style="font-size:24px; margin-bottom:6px;">⌨️</div>
+      <div style="font-weight:800; font-size:15px; color:#1e1b4b;">input()</div>
+      <div style="font-size:12px; color:#6b7280; margin-top:3px;">Ask the user to type</div>
+    </div>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+    <div class="card teal-border">
+      <div style="font-size:24px; margin-bottom:6px;">✨</div>
+      <div style="font-weight:800; font-size:15px; color:#1e1b4b;">f-strings</div>
+      <div style="font-size:12px; color:#6b7280; margin-top:3px;">Mix text and variables cleanly</div>
+    </div>
+    <div class="card violet-border">
+      <div style="font-size:24px; margin-bottom:6px;">🎮</div>
+      <div style="font-weight:800; font-size:15px; color:#1e1b4b;">First Program</div>
+      <div style="font-size:12px; color:#6b7280; margin-top:3px;">A personal greeting card</div>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:16px; font-size:14px;">💡 By the end of today you will have written, saved and run a real Python program. That's the goal.</div>
+  <div class="page-num">2 / 14</div>
+</div>
+
+<!-- SLIDE 3 — WHAT IS PYTHON -->
+<div class="slide section-intro">
+  <div class="panel purple">
+    <div class="section-emoji">🐍</div>
+    <div class="section-label">Python</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">What it is &amp; why we use it</div>
+  </div>
+  <div class="body">
+    <h2>What is Python? (60-second version)</h2>
+    <p style="margin-bottom:14px;">Python is a <strong>programming language</strong> — a way of giving instructions to a computer that both you and the computer can understand.</p>
+    <ul>
+      <li><span class="icon">📖</span><span><strong>Reads like English</strong> — easier to learn than most languages</span></li>
+      <li><span class="icon">🌍</span><span><strong>Used everywhere</strong> — AI, websites, data science, automation</span></li>
+      <li><span class="icon">🆓</span><span><strong>Free and open source</strong> — anyone can use it</span></li>
+      <li><span class="icon">⚡</span><span><strong>Instant feedback</strong> — write a line, run it, see the result</span></li>
+    </ul>
+    <div class="analogy">🧠 <strong>Think of it like this:</strong> computers only understand 1s and 0s. Python is the translator in the middle — you write something close to English, Python turns it into something the computer can run.</div>
+  </div>
+  <div class="page-num">3 / 14</div>
+</div>
+
+<!-- SLIDE 4 — RUNNING PYTHON -->
+<div class="slide content">
+  <h2>How to Run Python Code 🚀</h2>
+  <div class="grid-2" style="gap:26px; margin-top:8px;">
+    <div>
+      <h3>Two ways we'll use today</h3>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+        <div style="background:#f5f3ff; border-radius:12px; padding:14px 18px; border-left:4px solid #4f46e5;">
+          <div style="font-weight:800; color:#4f46e5; font-size:14px; margin-bottom:4px;">1. VS Code — write &amp; save files</div>
+          <div style="font-size:13px; color:#374151;">Create a <code style="background:#ede9fe; padding:1px 6px; border-radius:4px;">hello.py</code> file, write your code, press the Run button ▶️</div>
+        </div>
+        <div style="background:#f0fdf4; border-radius:12px; padding:14px 18px; border-left:4px solid #059669;">
+          <div style="font-weight:800; color:#059669; font-size:14px; margin-bottom:4px;">2. Terminal — run your file</div>
+          <div style="font-size:13px; color:#374151;">Open terminal, type <code style="background:#dcfce7; padding:1px 6px; border-radius:4px;">python hello.py</code>, press Enter</div>
+        </div>
+      </div>
+      <div class="highlight-box" style="font-size:13px; margin-top:14px;">📁 Every Python file ends in <code style="background:#fde047; padding:0 4px; border-radius:3px;">.py</code> — like <code style="background:#fde047; padding:0 4px; border-radius:3px;">hello.py</code> or <code style="background:#fde047; padding:0 4px; border-radius:3px;">my_program.py</code></div>
+    </div>
+    <div>
+      <h3>What happens when you run it?</h3>
+      <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+        <div style="background:#f8fafc; border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:14px; border-top:3px solid #fbbf24;">
+          <div style="font-size:28px;">✍️</div>
+          <div><div style="font-weight:700; font-size:13px; color:#1e1b4b;">You write code</div><div style="font-size:12px; color:#6b7280;">in hello.py</div></div>
+        </div>
+        <div style="text-align:center; font-size:20px; color:#c084fc;">↓</div>
+        <div style="background:#f8fafc; border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:14px; border-top:3px solid #34d399;">
+          <div style="font-size:28px;">🐍</div>
+          <div><div style="font-weight:700; font-size:13px; color:#1e1b4b;">Python reads it</div><div style="font-size:12px; color:#6b7280;">line by line</div></div>
+        </div>
+        <div style="text-align:center; font-size:20px; color:#c084fc;">↓</div>
+        <div style="background:#f8fafc; border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:14px; border-top:3px solid #38bdf8;">
+          <div style="font-size:28px;">📺</div>
+          <div><div style="font-weight:700; font-size:13px; color:#1e1b4b;">You see the result</div><div style="font-size:12px; color:#6b7280;">in the terminal</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-num">4 / 14</div>
+</div>
+
+<!-- SLIDE 5 — PRINT() -->
+<div class="slide section-intro">
+  <div class="panel green">
+    <div class="section-emoji">🖨️</div>
+    <div class="section-label">print()</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">Your first Python command</div>
+  </div>
+  <div class="body">
+    <h2>print() — Show Things on Screen</h2>
+    <p style="margin-bottom:14px;"><code style="background:#f3f4f6; padding:2px 8px; border-radius:4px; font-family:monospace;">print()</code> is how Python shows something to you. Whatever you put inside the brackets gets displayed on screen.</p>
+    <pre><span class="fn">print</span>(<span class="st">"Hello, world!"</span>)
+<span class="fn">print</span>(<span class="st">"My name is Alice."</span>)
+<span class="fn">print</span>(<span class="nm">42</span>)
+<span class="fn">print</span>(<span class="st">"⭐"</span> <span class="op">*</span> <span class="nm">10</span>)   <span class="cm"># prints ⭐ ten times</span></pre>
+    <div class="highlight-box" style="font-size:13.5px; margin-top:14px;">⚠️ Text must always be inside <strong>quote marks</strong> — either <code style="background:#fde047; padding:0 4px; border-radius:3px;">"double"</code> or <code style="background:#fde047; padding:0 4px; border-radius:3px;">'single'</code>. Numbers do not need quotes.</div>
+  </div>
+  <div class="page-num">5 / 14</div>
+</div>
+
+<!-- SLIDE 6 — PRINT IN ACTION -->
+<div class="slide dark">
+  <h2 style="color:#34d399; margin-bottom:14px;">print() in Action 💡</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <div style="font-size:11px; font-weight:700; color:#64748b; letter-spacing:2px; margin-bottom:10px;">BASIC EXAMPLES</div>
+      <pre><span class="fn">print</span>(<span class="st">"Good morning!"</span>)
+<span class="fn">print</span>(<span class="st">'Python is fun'</span>)   <span class="cm"># single quotes ok too</span>
+<span class="fn">print</span>(<span class="nm">100</span>)
+<span class="fn">print</span>(<span class="nm">3.14</span>)
+<span class="fn">print</span>(<span class="st">"Line 1"</span>)
+<span class="fn">print</span>(<span class="st">"Line 2"</span>)         <span class="cm"># each print = new line</span>
+<span class="fn">print</span>()               <span class="cm"># empty print = blank line</span></pre>
+    </div>
+    <div>
+      <div style="font-size:11px; font-weight:700; color:#64748b; letter-spacing:2px; margin-bottom:10px;">COMMON MISTAKES</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="background:#1e293b; border-radius:10px; padding:12px 16px; border-left:3px solid #ef4444;">
+          <div style="font-size:12px; color:#f87171; font-weight:700; margin-bottom:6px;">❌ Missing quotes</div>
+          <code style="font-family:'Fira Code',monospace; font-size:13px; color:#fca5a5;">print(Hello)  ← NameError!</code>
+        </div>
+        <div style="background:#1e293b; border-radius:10px; padding:12px 16px; border-left:3px solid #ef4444;">
+          <div style="font-size:12px; color:#f87171; font-weight:700; margin-bottom:6px;">❌ Capital P</div>
+          <code style="font-family:'Fira Code',monospace; font-size:13px; color:#fca5a5;">Print("Hello")  ← Python is case-sensitive!</code>
+        </div>
+        <div style="background:#1e293b; border-radius:10px; padding:12px 16px; border-left:3px solid #10b981;">
+          <div style="font-size:12px; color:#34d399; font-weight:700; margin-bottom:6px;">✅ Correct</div>
+          <code style="font-family:'Fira Code',monospace; font-size:13px; color:#a7f3d0;">print("Hello")  ← lowercase, quotes closed</code>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:14px; background:#1e293b; border-radius:10px; padding:11px 16px; font-size:13px; color:#fbbf24; font-weight:600; border-left:3px solid #fbbf24;">🧠 Error messages tell you exactly where and why something broke. Always read them!</div>
+  <div class="page-num">6 / 14</div>
+</div>
+
+<!-- SLIDE 7 — VARIABLES -->
+<div class="slide section-intro">
+  <div class="panel amber">
+    <div class="section-emoji">📦</div>
+    <div class="section-label">Variables</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">Store and reuse values</div>
+  </div>
+  <div class="body">
+    <h2>Variables — Labelled Boxes</h2>
+    <p style="margin-bottom:14px;">A <strong>variable</strong> is a labelled box where you store a value. Give the box a name, put something in, and use the name whenever you need that value.</p>
+    <pre><span class="var">name</span>  <span class="op">=</span> <span class="st">"Alice"</span>      <span class="cm"># a box called "name" holding "Alice"</span>
+<span class="var">age</span>   <span class="op">=</span> <span class="nm">15</span>           <span class="cm"># a box called "age" holding 15</span>
+<span class="var">city</span>  <span class="op">=</span> <span class="st">"Kathmandu"</span>
+
+<span class="fn">print</span>(<span class="var">name</span>)   <span class="cm"># Alice</span>
+<span class="fn">print</span>(<span class="var">age</span>)    <span class="cm"># 15</span>
+
+<span class="var">age</span> <span class="op">=</span> <span class="nm">16</span>      <span class="cm"># update the box anytime</span>
+<span class="fn">print</span>(<span class="var">age</span>)    <span class="cm"># 16</span></pre>
+    <div class="highlight-box" style="font-size:13px; margin-top:12px;">🔑 <code style="background:#fde047;padding:0 4px;border-radius:3px;">=</code> means "store this value" — it is NOT the equals sign from maths!</div>
+  </div>
+  <div class="page-num">7 / 14</div>
+</div>
+
+<!-- SLIDE 8 — NAMING RULES -->
+<div class="slide content">
+  <h2>Variable Naming Rules 📝</h2>
+  <div class="compare-row" style="margin-top:10px;">
+    <div class="compare-col good">
+      <h4>✅ Good names</h4>
+      <ul style="margin:0; gap:0;">
+        <li style="font-size:13.5px; padding:4px 0;"><code style="font-family:monospace; color:#065f46;">first_name = "Bob"</code> — underscore for spaces</li>
+        <li style="font-size:13.5px; padding:4px 0;"><code style="font-family:monospace; color:#065f46;">score1 = 100</code> — numbers OK (not at start)</li>
+        <li style="font-size:13.5px; padding:4px 0;"><code style="font-family:monospace; color:#065f46;">is_happy = True</code> — descriptive and clear</li>
+        <li style="font-size:13.5px; padding:4px 0;"><code style="font-family:monospace; color:#065f46;">total_price = 250</code> — lowercase_with_underscores</li>
+      </ul>
+    </div>
+    <div class="compare-col bad">
+      <h4>❌ Never do this</h4>
+      <ul style="margin:0; gap:0;">
+        <li style="font-size:13.5px; padding:4px 0;"><code style="font-family:monospace; color:#991b1b;">1score = 100</code> — cannot start with a number</li>
+        <li style="font-size:13.5px; padding:4px 0;"><code style="font-family:monospace; color:#991b1b;">my score = 100</code> — no spaces in names</li>
+        <li style="font-size:13.5px; padding:4px 0;"><code style="font-family:monospace; color:#991b1b;">my-score = 100</code> — dash means subtraction!</li>
+        <li style="font-size:13.5px; padding:4px 0;"><code style="font-family:monospace; color:#991b1b;">@name = "Bob"</code> — no special characters</li>
+      </ul>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:18px;">💡 Good names describe what is <em>inside</em> the box. <code style="background:#fde047; padding:0 4px; border-radius:3px;">student_age</code> beats <code style="background:#fde047; padding:0 4px; border-radius:3px;">x</code> every time!</div>
+  <div class="page-num">8 / 14</div>
+</div>
+
+<!-- SLIDE 9 — INPUT() -->
+<div class="slide section-intro">
+  <div class="panel blue">
+    <div class="section-emoji">⌨️</div>
+    <div class="section-label">input()</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">Ask the user to type something</div>
+  </div>
+  <div class="body">
+    <h2>input() — Talk to Your User</h2>
+    <p style="margin-bottom:14px;"><code style="background:#f3f4f6; padding:2px 8px; border-radius:4px; font-family:monospace;">input()</code> pauses your program and waits for the user to type something. Whatever they type is given back to you as text.</p>
+    <pre><span class="var">name</span> <span class="op">=</span> <span class="fn">input</span>(<span class="st">"What is your name? "</span>)
+<span class="fn">print</span>(<span class="st">"Nice to meet you, "</span> <span class="op">+</span> <span class="var">name</span>)
+
+<span class="var">city</span> <span class="op">=</span> <span class="fn">input</span>(<span class="st">"Where are you from? "</span>)
+<span class="fn">print</span>(<span class="st">"Cool! "</span> <span class="op">+</span> <span class="var">city</span> <span class="op">+</span> <span class="st">" is a great place."</span>)</pre>
+    <div style="margin-top:14px; background:#dbeafe; border-radius:10px; padding:12px 16px; font-size:13.5px; color:#1e40af; font-weight:600; border-left:4px solid #0284c7;">📌 The message inside <code style="background:#bfdbfe; padding:0 4px; border-radius:3px;">input("...")</code> is a <strong>prompt</strong>. Always end it with a space so it looks clean.</div>
+    <div class="highlight-box" style="font-size:13px; margin-top:12px;">⚠️ <code style="background:#fde047;padding:0 4px;border-radius:3px;">input()</code> always gives you <strong>text (a string)</strong> — even if the user types a number!</div>
+  </div>
+  <div class="page-num">9 / 14</div>
+</div>
+
+<!-- SLIDE 10 — F-STRINGS -->
+<div class="slide section-intro">
+  <div class="panel teal">
+    <div class="section-emoji">✨</div>
+    <div class="section-label">f-strings</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">The clean way to mix text and variables</div>
+  </div>
+  <div class="body">
+    <h2>f-strings — Mix Text and Variables Neatly</h2>
+    <p style="margin-bottom:14px;">Put an <strong>f</strong> before the quote and use <code style="font-family:monospace;">{curly braces}</code> to drop variables right into your text.</p>
+    <pre><span class="var">name</span> <span class="op">=</span> <span class="st">"Alice"</span>
+<span class="var">age</span>  <span class="op">=</span> <span class="nm">15</span>
+
+<span class="cm"># Old way — messy with lots of +</span>
+<span class="fn">print</span>(<span class="st">"Hello, "</span> <span class="op">+</span> <span class="var">name</span> <span class="op">+</span> <span class="st">". You are "</span> <span class="op">+</span> <span class="fn">str</span>(<span class="var">age</span>) <span class="op">+</span> <span class="st">" years old."</span>)
+
+<span class="cm"># f-string — clean ✨</span>
+<span class="fn">print</span>(<span class="st">f"Hello, </span><span style="color:#f472b6;">{</span><span style="color:#38bdf8;">name</span><span style="color:#f472b6;">}</span><span class="st">. You are </span><span style="color:#f472b6;">{</span><span style="color:#38bdf8;">age</span><span style="color:#f472b6;">}</span><span class="st"> years old."</span>)
+
+<span class="cm"># You can even do maths inside!</span>
+<span class="fn">print</span>(<span class="st">f"Next year you will be </span><span style="color:#f472b6;">{</span><span style="color:#38bdf8;">age</span> <span class="op">+</span> <span class="nm">1</span><span style="color:#f472b6;">}</span><span class="st">."</span>)</pre>
+    <div class="highlight-box" style="font-size:13.5px; margin-top:12px;">🚀 Always use f-strings when mixing variables with text. Much cleaner than lots of <code style="background:#fde047; padding:0 4px; border-radius:3px;">+</code> signs!</div>
+  </div>
+  <div class="page-num">10 / 14</div>
+</div>
+
+<!-- SLIDE 11 — PUTTING IT TOGETHER -->
+<div class="slide dark">
+  <h2 style="color:#38bdf8; margin-bottom:14px;">Putting It All Together 🎯</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <div style="font-size:11px; font-weight:700; color:#64748b; letter-spacing:2px; margin-bottom:10px;">A COMPLETE PROGRAM</div>
+      <pre><span class="cm"># greeting_card.py</span>
+<span class="var">name</span>    <span class="op">=</span> <span class="fn">input</span>(<span class="st">"Your name: "</span>)
+<span class="var">city</span>    <span class="op">=</span> <span class="fn">input</span>(<span class="st">"Your city: "</span>)
+<span class="var">feeling</span> <span class="op">=</span> <span class="fn">input</span>(<span class="st">"How are you feeling? "</span>)
+
+<span class="fn">print</span>()
+<span class="fn">print</span>(<span class="st">"================================"</span>)
+<span class="fn">print</span>(<span class="st">f"  Hello, </span><span style="color:#f472b6;">{</span><span style="color:#38bdf8;">name</span><span style="color:#f472b6;">}</span><span class="st">!"</span>)
+<span class="fn">print</span>(<span class="st">f"  From </span><span style="color:#f472b6;">{</span><span style="color:#38bdf8;">city</span><span style="color:#f472b6;">}</span><span class="st">, feeling </span><span style="color:#f472b6;">{</span><span style="color:#38bdf8;">feeling</span><span style="color:#f472b6;">}</span><span class="st">."</span>)
+<span class="fn">print</span>(<span class="st">"  Welcome to Python! 🐍"</span>)
+<span class="fn">print</span>(<span class="st">"================================"</span>)</pre>
+    </div>
+    <div>
+      <div style="font-size:11px; font-weight:700; color:#64748b; letter-spacing:2px; margin-bottom:10px;">WHAT EACH PART DOES</div>
+      <div style="display:flex; flex-direction:column; gap:8px; font-size:13px;">
+        <div style="background:#1e293b; border-radius:8px; padding:9px 14px; border-left:3px solid #4b5563; color:#94a3b8;"><code style="color:#4b5563;"># comment</code> — Python ignores this, it's just a note for you</div>
+        <div style="background:#1e293b; border-radius:8px; padding:9px 14px; border-left:3px solid #fbbf24; color:#e2e8f0;"><code style="color:#fbbf24;">input("...")</code> → pauses → user types → stored in variable</div>
+        <div style="background:#1e293b; border-radius:8px; padding:9px 14px; border-left:3px solid #34d399; color:#e2e8f0;"><code style="color:#34d399;">print()</code> with nothing → prints a blank line</div>
+        <div style="background:#1e293b; border-radius:8px; padding:9px 14px; border-left:3px solid #38bdf8; color:#e2e8f0;"><code style="color:#38bdf8;">f"... {name} ..."</code> → inserts variable into text</div>
+      </div>
+      <div style="margin-top:14px; background:#1e293b; border-radius:10px; padding:11px 16px; font-size:13px; color:#34d399; font-weight:600; border-left:3px solid #34d399;">✅ This is a real, complete Python program. You built it today.</div>
+    </div>
+  </div>
+  <div class="page-num">11 / 14</div>
+</div>
+
+<!-- SLIDE 12 — COMMENTS -->
+<div class="slide content">
+  <h2>Comments — Notes in Your Code 💬</h2>
+  <div class="grid-2" style="gap:26px; margin-top:8px;">
+    <div>
+      <p>A <strong>comment</strong> starts with <code style="font-family:monospace; background:#f3f4f6; padding:2px 6px; border-radius:4px;">#</code>. Python completely ignores everything after it on that line.</p>
+      <p style="margin-top:12px;">Comments are for <strong>you</strong> — to explain what your code does, leave reminders, or temporarily disable a line.</p>
+      <pre style="margin-top:14px;"><span class="cm"># This whole line is a comment</span>
+<span class="var">name</span> <span class="op">=</span> <span class="st">"Alice"</span>   <span class="cm"># comment at end of line</span>
+
+<span class="cm"># print("this line is turned off")</span>
+<span class="fn">print</span>(<span class="var">name</span>)      <span class="cm"># only this runs</span></pre>
+    </div>
+    <div>
+      <div class="analogy" style="margin-top:0;">🧠 <strong>Think of sticky notes on a recipe.</strong> The note doesn't change the recipe — it's just a reminder for the cook. A comment doesn't change your program — it's a reminder for you (or whoever reads your code next).</div>
+      <div class="highlight-box" style="margin-top:14px; font-size:13.5px;">💡 Good habit: add a comment at the top of every file saying what the program does.</div>
+    </div>
+  </div>
+  <div class="page-num">12 / 14</div>
+</div>
+
+<!-- SLIDE 13 — CODING SESSION -->
+<div class="slide content" style="padding:40px 58px;">
+  <h2 style="margin-bottom:14px;">Today's Coding Session 💻</h2>
+  <p style="margin-bottom:16px; font-size:15px;">Open VS Code · open <code style="background:#f3f4f6; padding:2px 8px; border-radius:6px; font-family:monospace;">my_first_code.py</code> · let's build these together.</p>
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <div style="display:flex; align-items:center; gap:16px; background:#f5f3ff; border-radius:12px; padding:13px 20px; border-left:4px solid #4f46e5;">
+      <div style="font-size:22px;">🖨️</div>
+      <div style="flex:1;"><div style="font-weight:700; color:#4f46e5; font-size:14px;">Exercise 1 — Print parade</div><div style="font-size:12px; color:#6b7280;">Print your name, city, favourite food, and a line of 20 stars using <code style="font-family:monospace;">*</code></div></div>
+      <span class="pill pill-purple">5 min</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px; background:#fffbeb; border-radius:12px; padding:13px 20px; border-left:4px solid #d97706;">
+      <div style="font-size:22px;">📦</div>
+      <div style="flex:1;"><div style="font-weight:700; color:#d97706; font-size:14px;">Exercise 2 — Variable profile</div><div style="font-size:12px; color:#6b7280;">Create 4 variables (name, age, city, hobby) and print each one</div></div>
+      <span class="pill pill-amber">8 min</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px; background:#eff6ff; border-radius:12px; padding:13px 20px; border-left:4px solid #0284c7;">
+      <div style="font-size:22px;">⌨️</div>
+      <div style="flex:1;"><div style="font-weight:700; color:#0284c7; font-size:14px;">Exercise 3 — Ask the user</div><div style="font-size:12px; color:#6b7280;">Use <code style="font-family:monospace;">input()</code> to ask for name and favourite colour, then print a sentence using both</div></div>
+      <span class="pill pill-blue">8 min</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px; background:#f0fdfa; border-radius:12px; padding:13px 20px; border-left:4px solid #0d9488;">
+      <div style="font-size:22px;">✨</div>
+      <div style="flex:1;"><div style="font-weight:700; color:#0d9488; font-size:14px;">Exercise 4 — f-string greeting card</div><div style="font-size:12px; color:#6b7280;">Ask for name, city and mood. Print a nicely formatted greeting using f-strings</div></div>
+      <span class="pill" style="background:#ccfbf1; color:#134e4a;">10 min</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px; background:#fef2f2; border-radius:12px; padding:13px 20px; border-left:4px solid #be185d;">
+      <div style="font-size:22px;">🌶️</div>
+      <div style="flex:1;"><div style="font-weight:700; color:#be185d; font-size:14px;">Bonus — Mad Libs</div><div style="font-size:12px; color:#6b7280;">Ask for a name, a verb, an animal, and a place — print a funny story using all four</div></div>
+      <span class="pill" style="background:#ffe4e6; color:#9f1239;">if time</span>
+    </div>
+  </div>
+  <div class="page-num">13 / 14</div>
+</div>
+
+<!-- SLIDE 14 — CLOSING -->
+<div class="slide hero" style="background: linear-gradient(135deg, #4f46e5 0%, #059669 60%, #0d9488 100%);">
+  <div class="blob blob1" style="background:#a7f3d0;"></div>
+  <div class="blob blob2" style="background:#bfdbfe;"></div>
+  <div style="font-size:72px; line-height:1; margin-bottom:18px;">🎉</div>
+  <div class="slide-title" style="font-size:52px;">Day 2 done!</div>
+  <div class="slide-subtitle">You wrote real Python code. That's a big deal.</div>
+  <div style="margin-top:28px; display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+    <div style="background:rgba(255,255,255,0.18); border-radius:10px; padding:10px 18px; font-size:14px; font-weight:700;">🖨️ print()</div>
+    <div style="background:rgba(255,255,255,0.18); border-radius:10px; padding:10px 18px; font-size:14px; font-weight:700;">📦 variables</div>
+    <div style="background:rgba(255,255,255,0.18); border-radius:10px; padding:10px 18px; font-size:14px; font-weight:700;">⌨️ input()</div>
+    <div style="background:rgba(255,255,255,0.18); border-radius:10px; padding:10px 18px; font-size:14px; font-weight:700;">✨ f-strings</div>
+    <div style="background:rgba(255,255,255,0.18); border-radius:10px; padding:10px 18px; font-size:14px; font-weight:700;">💬 comments</div>
+  </div>
+  <div style="margin-top:26px; font-size:15px; opacity:0.9; font-weight:600; max-width:600px; line-height:1.6;">Tomorrow: numbers, strings, and Python as a calculator. 🔢</div>
+  <div class="page-num" style="color:rgba(255,255,255,0.45);">14 / 14</div>
+</div>
+
+<script>
+(function() {
+  const SLIDE_W = 1122;
+  const SLIDE_H = 794;
+  let presentMode = false;
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  let currentSlide = 0;
+
+  function updateScale() {
+    if (!presentMode) return;
+    const scale = Math.min(window.innerWidth / SLIDE_W, window.innerHeight / SLIDE_H);
+    document.documentElement.style.setProperty('--present-scale', scale);
+  }
+
+  function togglePresent() {
+    presentMode = !presentMode;
+    document.body.classList.toggle('present-mode', presentMode);
+    updateScale();
+    if (presentMode && slides[currentSlide]) {
+      slides[currentSlide].scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+  }
+
+  function scrollToSlide(index) {
+    if (index >= 0 && index < slides.length) {
+      slides[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      currentSlide = index;
+    }
+  }
+
+  window.addEventListener('resize', updateScale);
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (e.key === 'f' || e.key === 'F') {
+      e.preventDefault();
+      togglePresent();
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      scrollToSlide(currentSlide + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      scrollToSlide(currentSlide - 1);
+    }
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        currentSlide = slides.indexOf(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  slides.forEach(slide => observer.observe(slide));
+
+  const hint = document.createElement('div');
+  hint.className = 'controls-hint show';
+  hint.textContent = "Press 'F' for fullscreen mode • Arrow keys to navigate";
+  document.body.appendChild(hint);
+  setTimeout(() => hint.classList.remove('show'), 6000);
+})();
+</script>
+</body>
+</html>

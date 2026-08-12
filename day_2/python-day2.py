@@ -1,0 +1,10 @@
+name    = input("Your name: ")
+city    = input("Your city: ")
+feeling = input("How are you feeling? ")
+
+print()
+print("================================")
+print(f"  Hello, {name}!")
+print(f"  From {city}, feeling {feeling}.")
+print("  Welcome to Python! 🐍")
+print("================================")

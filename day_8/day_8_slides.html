@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 8: Object-Oriented Programming 🐍</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Fira+Code:wght@400;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    @page { size: A4 landscape; margin: 0; }
+
+    body { font-family: 'Poppins', 'Segoe UI', sans-serif; background: #e8e8e8; }
+
+    .slide {
+      width: 297mm;
+      height: 210mm;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      page-break-after: always;
+      break-after: page;
+    }
+    @media screen { .slide { margin: 20px auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); } }
+
+    .blob { position: absolute; border-radius: 50%; opacity: 0.15; pointer-events: none; }
+
+    /* ── Themes ─── */
+    .hero {
+      background: linear-gradient(135deg, #0d9488 0%, #4f46e5 50%, #7c3aed 100%);
+      color: white; justify-content: center; align-items: center; text-align: center; padding: 60px;
+    }
+    .hero .blob1 { width: 300px; height: 300px; background: white; top: -90px; right: -70px; }
+    .hero .blob2 { width: 220px; height: 220px; background: #c4b5fd; bottom: -70px; left: -50px; }
+
+    .section-intro { background: white; flex-direction: row; }
+    .section-intro .panel {
+      width: 36%; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; padding: 50px 28px; color: white;
+    }
+    .section-intro .body { width: 64%; padding: 44px 52px; display: flex; flex-direction: column; justify-content: center; }
+
+    .content { background: white; padding: 48px 62px; }
+    .dark { background: #0f172a; color: #e2e8f0; padding: 46px 62px; }
+
+    /* ── Gradients ─── */
+    .purple  { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .green   { background: linear-gradient(135deg, #059669, #10b981); }
+    .blue    { background: linear-gradient(135deg, #0284c7, #0ea5e9); }
+    .amber   { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .teal    { background: linear-gradient(135deg, #0d9488, #14b8a6); }
+    .violet  { background: linear-gradient(135deg, #6d28d9, #8b5cf6); }
+    .rose    { background: linear-gradient(135deg, #be185d, #e11d48); }
+    .indigo  { background: linear-gradient(135deg, #3730a3, #4f46e5); }
+    .orange  { background: linear-gradient(135deg, #c2410c, #ea580c); }
+    .fuchsia { background: linear-gradient(135deg, #86198f, #c026d3); }
+    .cyan    { background: linear-gradient(135deg, #0e7490, #06b6d4); }
+
+    /* ── Typography ─── */
+    .slide-tag { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; opacity: 0.7; margin-bottom: 10px; }
+    .slide-title { font-size: 52px; font-weight: 900; line-height: 1.1; }
+    .slide-subtitle { font-size: 22px; font-weight: 400; opacity: 0.85; margin-top: 14px; }
+    .section-emoji { font-size: 88px; line-height: 1; margin-bottom: 14px; }
+    .section-label { font-size: 19px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+
+    h2 { font-size: 31px; font-weight: 800; color: #1e1b4b; margin-bottom: 20px; }
+    h3 { font-size: 20px; font-weight: 700; color: #1e1b4b; margin-bottom: 10px; }
+    .dark h2 { color: #e2e8f0; }
+    .dark h3 { color: #94a3b8; }
+
+    p { font-size: 16px; line-height: 1.65; color: #374151; }
+    .dark p { color: #cbd5e1; }
+
+    ul { list-style: none; margin-top: 6px; }
+    ul li { font-size: 16px; color: #374151; padding: 5px 0; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+    .dark ul li { color: #cbd5e1; }
+    ul li .icon { flex-shrink: 0; font-size: 17px; margin-top: 1px; }
+
+    /* ── Code ─── */
+    pre {
+      background: #0f172a; border-radius: 12px; padding: 18px 22px;
+      font-family: 'Fira Code', 'Consolas', monospace; font-size: 14px;
+      line-height: 1.75; color: #e2e8f0; overflow: hidden;
+    }
+    .dark pre { background: #1e293b; }
+    pre .kw   { color: #c084fc; }
+    pre .fn   { color: #34d399; }
+    pre .st   { color: #fbbf24; }
+    pre .cm   { color: #64748b; }
+    pre .nm   { color: #38bdf8; }
+    pre .op   { color: #f472b6; }
+    pre .var  { color: #e2e8f0; }
+    pre .hl   { background: rgba(251,191,36,0.15); display: block; margin: 0 -22px; padding: 0 22px; }
+    pre .self { color: #fb923c; }
+    pre .dec  { color: #67e8f9; }
+    pre .ty   { color: #67e8f9; }
+
+    /* ── Layouts ─── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+    /* ── Cards ─── */
+    .card { background: #f8fafc; border-radius: 14px; padding: 18px 22px; border-left: 5px solid #4f46e5; }
+    .card.green-border   { border-left-color: #059669; }
+    .card.blue-border    { border-left-color: #0284c7; }
+    .card.amber-border   { border-left-color: #d97706; }
+    .card.teal-border    { border-left-color: #0d9488; }
+    .card.violet-border  { border-left-color: #6d28d9; }
+    .card.rose-border    { border-left-color: #be185d; }
+    .card.indigo-border  { border-left-color: #4f46e5; }
+    .card.orange-border  { border-left-color: #ea580c; }
+    .card.purple-border  { border-left-color: #7c3aed; }
+    .card.fuchsia-border { border-left-color: #c026d3; }
+    .card.cyan-border    { border-left-color: #06b6d4; }
+
+    /* ── Pills ─── */
+    .pill { display: inline-block; padding: 4px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .pill-green   { background: #d1fae5; color: #065f46; }
+    .pill-blue    { background: #dbeafe; color: #1e40af; }
+    .pill-amber   { background: #fef3c7; color: #92400e; }
+    .pill-teal    { background: #ccfbf1; color: #134e4a; }
+    .pill-violet  { background: #ede9fe; color: #4c1d95; }
+    .pill-rose    { background: #ffe4e6; color: #9f1239; }
+    .pill-orange  { background: #ffedd5; color: #9a3412; }
+    .pill-purple  { background: #f3e8ff; color: #6b21a8; }
+    .pill-indigo  { background: #e0e7ff; color: #3730a3; }
+    .pill-cyan    { background: #cffafe; color: #155e75; }
+
+    /* ── Highlight boxes ─── */
+    .highlight-box {
+      background: #fef9c3; border: 2px solid #fde047; border-radius: 10px;
+      padding: 12px 18px; font-size: 15px; color: #713f12; margin-top: 16px; font-weight: 600;
+    }
+    .danger-box {
+      background: #fef2f2; border: 2px solid #fca5a5; border-radius: 10px;
+      padding: 12px 18px; font-size: 15px; color: #991b1b; margin-top: 16px; font-weight: 600;
+    }
+    .info-box {
+      background: #eff6ff; border: 2px solid #93c5fd; border-radius: 10px;
+      padding: 12px 18px; font-size: 15px; color: #1e40af; margin-top: 16px; font-weight: 600;
+    }
+    .success-box {
+      background: #f0fdf4; border: 2px solid #86efac; border-radius: 10px;
+      padding: 12px 18px; font-size: 15px; color: #14532d; margin-top: 16px; font-weight: 600;
+    }
+
+    /* ── Step trace ─── */
+    .trace { font-family: 'Fira Code', monospace; font-size: 13px; background: #f1f5f9; border-radius: 10px; padding: 14px 18px; line-height: 2; }
+    .trace .step  { display: flex; gap: 14px; align-items: center; }
+    .trace .arrow { color: #0284c7; font-weight: 700; }
+    .trace .yes   { color: #059669; font-weight: 700; }
+    .trace .no    { color: #dc2626; font-weight: 700; }
+
+    /* ── Page number ─── */
+    .page-num { position: absolute; bottom: 16px; right: 26px; font-size: 11px; font-weight: 600; opacity: 0.32; letter-spacing: 1px; }
+
+    /* ── Present mode ─── */
+    :root { --present-scale: 1; }
+    body.present-mode {
+      background: #111;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    body.present-mode::-webkit-scrollbar { display: none; }
+    body.present-mode .slide {
+      transform: scale(var(--present-scale));
+      transform-origin: top center;
+      margin: 0 auto calc(794px * (var(--present-scale) - 1) + 40px * var(--present-scale));
+      box-shadow: none;
+      border-radius: 0;
+    }
+    body.present-mode .page-num { display: none; }
+
+    .controls-hint {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-family: 'Poppins', sans-serif;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .controls-hint.show { opacity: 1; }
+    body.present-mode .controls-hint { display: none; }
+  </style>
+</head>
+<body>
+
+
+<!-- ========================================
+  SLIDE 1 - TITLE
+======================================== -->
+<div class="slide hero">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="slide-tag">Python Crash Course · Day 8</div>
+  <div class="slide-title">Object-Oriented<br>Programming</div>
+  <div class="slide-subtitle">Classes · Objects · Attributes · Methods</div>
+  <div style="margin-top:30px; font-size:60px; line-height:1;">🚗</div>
+  <div style="margin-top:26px; font-size:12px; opacity:0.6; font-weight:600; letter-spacing:2px; text-transform:uppercase;">
+    Bundle data and behavior together — one Car at a time.
+  </div>
+  <div class="page-num" style="color:white; opacity:0.4;">1 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 2 - AGENDA
+======================================== -->
+<div class="slide content" style="padding:36px 56px;">
+  <h2 style="margin-bottom:14px;">Today's Roadmap 🗺️ — Day 8</h2>
+  <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:12px; margin-bottom:16px;">
+    <div class="card teal-border">
+      <div style="font-size:26px; margin-bottom:6px;">🏠</div>
+      <div style="font-weight:800; font-size:12px; color:#1e1b4b;">Object</div>
+      <div style="font-size:10px; color:#6b7280; margin-top:4px;">Attributes + methods</div>
+    </div>
+    <div class="card purple-border">
+      <div style="font-size:26px; margin-bottom:6px;">📐</div>
+      <div style="font-weight:800; font-size:12px; color:#1e1b4b;">Class</div>
+      <div style="font-size:10px; color:#6b7280; margin-top:4px;">The blueprint</div>
+    </div>
+    <div class="card amber-border">
+      <div style="font-size:26px; margin-bottom:6px;">📦</div>
+      <div style="font-weight:800; font-size:12px; color:#1e1b4b;">Attributes</div>
+      <div style="font-size:10px; color:#6b7280; margin-top:4px;">What objects have</div>
+    </div>
+    <div class="card blue-border">
+      <div style="font-size:26px; margin-bottom:6px;">🏷️</div>
+      <div style="font-weight:800; font-size:12px; color:#1e1b4b;">Annotations</div>
+      <div style="font-size:10px; color:#6b7280; margin-top:4px;">Type hints</div>
+    </div>
+    <div class="card violet-border">
+      <div style="font-size:26px; margin-bottom:6px;">⚙️</div>
+      <div style="font-weight:800; font-size:12px; color:#1e1b4b;">Constructor</div>
+      <div style="font-size:10px; color:#6b7280; margin-top:4px;">__init__ &amp; self</div>
+    </div>
+    <div class="card green-border">
+      <div style="font-size:26px; margin-bottom:6px;">🎬</div>
+      <div style="font-weight:800; font-size:12px; color:#1e1b4b;">Methods</div>
+      <div style="font-size:10px; color:#6b7280; margin-top:4px;">What objects do</div>
+    </div>
+    <div class="card cyan-border">
+      <div style="font-size:26px; margin-bottom:6px;">📁</div>
+      <div style="font-weight:800; font-size:12px; color:#1e1b4b;">Organization</div>
+      <div style="font-size:10px; color:#6b7280; margin-top:4px;">Separate files</div>
+    </div>
+  </div>
+  <div style="background:#f0fdfa; border-radius:12px; padding:14px 20px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+    <div style="text-align:center; border-right:1px solid #bbf7d0; padding-right:12px;">
+      <div style="font-size:11px; font-weight:700; color:#059669; letter-spacing:1.5px;">DAY 7 ✓</div>
+      <div style="font-size:12px; color:#374151; margin-top:4px;">Advanced functions<br>*args · **kwargs · recursion</div>
+    </div>
+    <div style="text-align:center; border-right:1px solid #bbf7d0; padding-right:12px;">
+      <div style="font-size:11px; font-weight:700; color:#0d9488; letter-spacing:1.5px;">TODAY ←</div>
+      <div style="font-size:12px; color:#374151; margin-top:4px;">Object-Oriented<br>Programming basics</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-size:11px; font-weight:700; color:#1d4ed8; letter-spacing:1.5px;">DAY 9 →</div>
+      <div style="font-size:12px; color:#374151; margin-top:4px;">Advanced OOP<br>Inheritance · polymorphism</div>
+    </div>
+  </div>
+  <div class="highlight-box" style="font-size:13px; margin-top:14px;">
+    📌 Today we focus on the <strong>mechanics</strong> of OOP: how to write a class, create objects, and give them data and behaviour.
+  </div>
+  <div class="page-num">2 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 3 - WHAT IS AN OBJECT?
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:12px;">What is an Object? 🏠</h2>
+  <p style="margin-bottom:18px;">An <strong>object</strong> is a bundle of related <strong>attributes</strong> (data) and <strong>methods</strong> (actions). Look around you — almost everything is an object.</p>
+  <div class="grid-3" style="gap:16px;">
+    <div class="card purple-border">
+      <div style="font-size:34px; margin-bottom:8px;">📱</div>
+      <h3 style="font-size:16px;">Phone</h3>
+      <ul style="margin-top:4px;">
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>version: <span class="ty">int</span></li>
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>is_on: <span class="ty">bool</span></li>
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>price: <span class="ty">float</span></li>
+      </ul>
+    </div>
+    <div class="card teal-border">
+      <div style="font-size:34px; margin-bottom:8px;">☕</div>
+      <h3 style="font-size:16px;">Cup</h3>
+      <ul style="margin-top:4px;">
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>liquid: <span class="ty">str</span></li>
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>temperature: <span class="ty">int</span></li>
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>is_empty: <span class="ty">bool</span></li>
+      </ul>
+    </div>
+    <div class="card amber-border">
+      <div style="font-size:34px; margin-bottom:8px;">📚</div>
+      <h3 style="font-size:16px;">Book</h3>
+      <ul style="margin-top:4px;">
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>title: <span class="ty">str</span></li>
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>pages: <span class="ty">int</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="info-box" style="font-size:13px; margin-top:16px;">
+    💡 Each object groups <strong>what it knows</strong> (attributes) and <strong>what it can do</strong> (methods) into one tidy package.
+  </div>
+  <div class="page-num">3 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 4 - ATTRIBUTES
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:12px;">Attributes — What an Object HAS 📦</h2>
+  <p style="margin-bottom:16px;">Attributes are like <strong>variables that belong to an object</strong>. They describe the object's current state.</p>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre style="font-size:13px;"><span class="cm"># Phone attributes</span>
+<span class="var">version</span> <span class="op">=</span> <span class="nm">16</span>
+<span class="var">is_on</span>   <span class="op">=</span> <span class="kw">True</span>
+<span class="var">price</span>   <span class="op">=</span> <span class="nm">999.99</span>
+
+<span class="cm"># Cup attributes</span>
+<span class="var">liquid</span>      <span class="op">=</span> <span class="st">"coffee"</span>
+<span class="var">temperature</span> <span class="op">=</span> <span class="nm">65</span>
+<span class="var">is_empty</span>    <span class="op">=</span> <span class="kw">False</span>
+
+<span class="cm"># Book attributes</span>
+<span class="var">title</span> <span class="op">=</span> <span class="st">"Python Crash Course"</span>
+<span class="var">pages</span> <span class="op">=</span> <span class="nm">320</span></pre>
+    </div>
+    <div>
+      <div class="card amber-border" style="margin-bottom:12px;">
+        <h3 style="font-size:16px;">Attributes = variables attached to an object</h3>
+        <p style="font-size:14px;">They answer the question: <em>"What does this object have?"</em></p>
+      </div>
+      <div class="card blue-border" style="margin-bottom:12px;">
+        <h3 style="font-size:16px;">Different objects, different values</h3>
+        <p style="font-size:14px;">One phone can be on; another can be off. One cup can be empty; another can be full.</p>
+      </div>
+      <div class="success-box" style="font-size:13px;">
+        ✅ Attributes store the <strong>state</strong> of an object.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">4 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 5 - METHODS
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:12px;">Methods — What an Object CAN DO 🎬</h2>
+  <p style="margin-bottom:16px;">A <strong>method</strong> is a function that belongs to an object. It represents an <strong>action</strong> the object can perform.</p>
+  <div class="grid-3" style="gap:16px;">
+    <div class="card purple-border">
+      <div style="font-size:34px; margin-bottom:8px;">📱</div>
+      <h3 style="font-size:16px;">Phone methods</h3>
+      <ul style="margin-top:4px;">
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>make_call()</li>
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>turn_on()</li>
+      </ul>
+    </div>
+    <div class="card teal-border">
+      <div style="font-size:34px; margin-bottom:8px;">☕</div>
+      <h3 style="font-size:16px;">Cup methods</h3>
+      <ul style="margin-top:4px;">
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>fill()</li>
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>drink()</li>
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>empty()</li>
+      </ul>
+    </div>
+    <div class="card amber-border">
+      <div style="font-size:34px; margin-bottom:8px;">📚</div>
+      <h3 style="font-size:16px;">Book methods</h3>
+      <ul style="margin-top:4px;">
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>open()</li>
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>read()</li>
+        <li style="font-size:13px; padding:3px 0;"><span class="icon">•</span>close()</li>
+      </ul>
+    </div>
+  </div>
+  <div class="highlight-box" style="font-size:13px; margin-top:16px;">
+    📌 Methods are <strong>functions that belong to an object</strong>. They let the object DO things.
+  </div>
+  <div class="page-num">5 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 6 - FROM OBJECT TO CLASS
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:12px;">From Object to Class 📐</h2>
+  <p style="margin-bottom:16px;">A <strong>class</strong> is a blueprint used to design the structure and layout of an object. It defines what attributes and methods every object will have.</p>
+  <div class="grid-2" style="gap:22px; align-items:center;">
+    <div>
+      <div class="trace" style="margin-bottom:12px;">
+        <div><span class="arrow">Class</span> The blueprint (the recipe)</div>
+        <div><span class="arrow">Object</span> One real thing built from the blueprint</div>
+      </div>
+      <ul>
+        <li><span class="icon">•</span>A class describes <strong>what an object should look like</strong></li>
+        <li><span class="icon">•</span>One class can create <strong>many objects</strong></li>
+        <li><span class="icon">•</span>Each object is independent</li>
+      </ul>
+    </div>
+    <div>
+      <pre style="font-size:13px;"><span class="cm"># Class = blueprint for a Car</span>
+<span class="kw">class</span> <span class="fn">Car</span>:
+    <span class="kw">pass</span>
+
+<span class="cm"># Objects = real cars built from the blueprint</span>
+<span class="var">car1</span> <span class="op">=</span> <span class="fn">Car</span>()
+<span class="var">car2</span> <span class="op">=</span> <span class="fn">Car</span>()
+<span class="var">car3</span> <span class="op">=</span> <span class="fn">Car</span>()
+
+<span class="fn">print</span>(<span class="var">car1</span> <span class="op">==</span> <span class="var">car2</span>)
+<span class="cm"># False -> three independent objects</span></pre>
+    </div>
+  </div>
+  <div class="info-box" style="font-size:13px; margin-top:12px;">
+    💡 <code>Car</code> is the blueprint. <code>car1</code>, <code>car2</code>, and <code>car3</code> are real cars built from it.
+  </div>
+  <div class="page-num">6 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 7 - CREATING A CLASS
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:12px;">Creating a Class 🏗️</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <p style="margin-bottom:10px;">Rules for writing classes:</p>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">•</span>Start with the <code>class</code> keyword</li>
+        <li><span class="icon">•</span>Use <strong>PascalCase</strong> for the class name</li>
+        <li><span class="icon">•</span>The body is indented</li>
+        <li><span class="icon">•</span><code>pass</code> means "empty on purpose"</li>
+      </ul>
+      <div class="danger-box" style="font-size:13px;">
+        ❌ <code>class car:</code> &nbsp; ❌ <code>class bank_account:</code><br>
+        ✅ <code>class Car:</code> &nbsp; ✅ <code>class BankAccount:</code>
+      </div>
+    </div>
+    <div>
+      <pre><span class="cm"># Define the blueprint</span>
+<span class="kw">class</span> <span class="fn">Car</span>:
+    <span class="kw">pass</span>
+
+<span class="cm"># Car is now a blueprint we can use</span>
+<span class="var">my_car</span> <span class="op">=</span> <span class="fn">Car</span>()
+
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="var">my_car</span>))
+<span class="cm"># &lt;class '__main__.Car'&gt;</span></pre>
+    </div>
+  </div>
+  <div class="page-num">7 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 8 - THE CONSTRUCTOR __init__
+======================================== -->
+<div class="slide section-intro">
+  <div class="panel teal">
+    <div class="section-emoji">⚙️</div>
+    <div class="section-label">__init__</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">The constructor sets up every object safely.</div>
+  </div>
+  <div class="body">
+    <h2>The Constructor</h2>
+    <p style="margin-bottom:14px;"><code>__init__</code> is a special method that Python calls <strong>automatically</strong> when you create a new object. It sets up the object's attributes.</p>
+    <pre><span class="kw">class</span> <span class="fn">Car</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>, <span class="var">model</span>, <span class="var">year</span>, <span class="var">color</span>, <span class="var">for_sale</span>):
+        <span class="self">self</span><span class="op">.</span><span class="var">model</span>    <span class="op">=</span> <span class="var">model</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">year</span>     <span class="op">=</span> <span class="var">year</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">color</span>    <span class="op">=</span> <span class="var">color</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">for_sale</span> <span class="op">=</span> <span class="var">for_sale</span>
+
+<span class="var">car1</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Mustang"</span>, <span class="nm">2024</span>, <span class="st">"red"</span>, <span class="kw">False</span>)
+<span class="fn">print</span>(<span class="var">car1</span><span class="op">.</span><span class="var">model</span>)  <span class="cm"># Mustang</span></pre>
+    <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+      <div class="pill pill-teal">__init__ runs automatically</div>
+      <div class="pill pill-blue">self stores data on the object</div>
+      <div class="pill pill-green">no more missing attributes</div>
+    </div>
+  </div>
+  <div class="page-num">8 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 9 - CREATING OBJECTS
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:12px;">Creating Objects 🚗</h2>
+  <p style="margin-bottom:14px;">Use the class name like a function. Pass the values <code>__init__</code> expects.</p>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre style="font-size:13px;"><span class="kw">class</span> <span class="fn">Car</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>, <span class="var">model</span>, <span class="var">year</span>,
+                 <span class="var">color</span>, <span class="var">for_sale</span>):
+        <span class="self">self</span><span class="op">.</span><span class="var">model</span>    <span class="op">=</span> <span class="var">model</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">year</span>     <span class="op">=</span> <span class="var">year</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">color</span>    <span class="op">=</span> <span class="var">color</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">for_sale</span> <span class="op">=</span> <span class="var">for_sale</span>
+
+<span class="var">car1</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Mustang"</span>, <span class="nm">2024</span>, <span class="st">"red"</span>, <span class="kw">False</span>)
+<span class="var">car2</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Corvette"</span>, <span class="nm">2025</span>, <span class="st">"blue"</span>, <span class="kw">True</span>)
+<span class="var">car3</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Charger"</span>, <span class="nm">2026</span>, <span class="st">"black"</span>, <span class="kw">False</span>)</pre>
+    </div>
+    <div>
+      <div class="trace">
+        <div><span class="arrow">car1</span> Mustang, 2024, red, not for sale</div>
+        <div><span class="arrow">car2</span> Corvette, 2025, blue, for sale</div>
+        <div><span class="arrow">car3</span> Charger, 2026, black, not for sale</div>
+      </div>
+      <div class="success-box" style="font-size:13px; margin-top:12px;">
+        ✅ One class, three independent cars — each with its own data.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">9 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 10 - ACCESSING ATTRIBUTES
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:12px;">Accessing Attributes 🔍</h2>
+  <p style="margin-bottom:14px;">Use the <strong>dot operator</strong> to read an object's attributes.</p>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre style="font-size:13px;"><span class="var">car1</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Mustang"</span>, <span class="nm">2024</span>, <span class="st">"red"</span>, <span class="kw">False</span>)
+
+<span class="cm"># Read attributes with dot notation</span>
+<span class="fn">print</span>(<span class="var">car1</span><span class="op">.</span><span class="var">model</span>)
+<span class="cm"># Mustang</span>
+
+<span class="fn">print</span>(<span class="var">car1</span><span class="op">.</span><span class="var">year</span>)
+<span class="cm"># 2024</span>
+
+<span class="fn">print</span>(<span class="var">car1</span><span class="op">.</span><span class="var">color</span>)
+<span class="cm"># red</span>
+
+<span class="fn">print</span>(<span class="var">car1</span><span class="op">.</span><span class="var">for_sale</span>)
+<span class="cm"># False</span></pre>
+    </div>
+    <div>
+      <div class="card blue-border" style="margin-bottom:12px;">
+        <h3 style="font-size:16px;">Dot operator</h3>
+        <p style="font-size:14px;"><code>object.attribute</code> looks inside the object and finds the value.</p>
+      </div>
+      <div class="card amber-border" style="margin-bottom:12px;">
+        <h3 style="font-size:16px;">Attributes can be changed</h3>
+        <p style="font-size:14px;"><code>car1.color = "blue"</code> updates that specific car only.</p>
+      </div>
+      <div class="success-box" style="font-size:13px;">
+        ✅ Each object stores its own attribute values.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">10 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 11 - TYPE ANNOTATIONS
+======================================== -->
+<div class="slide content" style="padding:36px 54px;">
+  <h2 style="margin-bottom:12px;">Type Annotations 🏷️</h2>
+  <p style="margin-bottom:14px;">Type hints tell humans (and tools) what kind of value each attribute and argument should be. They do not change how the code runs.</p>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre style="font-size:12px;"><span class="kw">class</span> <span class="fn">Car</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>, <span class="var">model</span><span class="op">:</span> <span class="ty">str</span>,
+                 <span class="var">year</span><span class="op">:</span> <span class="ty">int</span>,
+                 <span class="var">color</span><span class="op">:</span> <span class="ty">str</span>,
+                 <span class="var">for_sale</span><span class="op">:</span> <span class="ty">bool</span>) <span class="op">-&gt;</span> <span class="ty">None</span>:
+        <span class="self">self</span><span class="op">.</span><span class="var">model</span><span class="op">:</span>    <span class="ty">str</span>  <span class="op">=</span> <span class="var">model</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">year</span><span class="op">:</span>     <span class="ty">int</span>  <span class="op">=</span> <span class="var">year</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">color</span><span class="op">:</span>    <span class="ty">str</span>  <span class="op">=</span> <span class="var">color</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">for_sale</span><span class="op">:</span> <span class="ty">bool</span> <span class="op">=</span> <span class="var">for_sale</span></pre>
+    </div>
+    <div>
+      <div class="card blue-border" style="margin-bottom:12px;">
+        <h3 style="font-size:16px;">Common type hints</h3>
+        <ul style="margin-top:4px;">
+          <li style="font-size:14px;"><span class="icon">•</span><code class="ty">str</code> for text</li>
+          <li style="font-size:14px;"><span class="icon">•</span><code class="ty">int</code> for whole numbers</li>
+          <li style="font-size:14px;"><span class="icon">•</span><code class="ty">float</code> for decimals</li>
+          <li style="font-size:14px;"><span class="icon">•</span><code class="ty">bool</code> for True/False</li>
+        </ul>
+      </div>
+      <div class="highlight-box" style="font-size:13px;">
+        📌 <code class="ty">-&gt; None</code> means "this method does not return a value."
+      </div>
+    </div>
+  </div>
+  <div class="page-num">11 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 12 - UNDERSTANDING self
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:12px;">Understanding <code>self</code> 🙋</h2>
+  <p style="margin-bottom:14px;"><code>self</code> is always the first parameter of every method. It refers to <strong>this object we are creating right now</strong>.</p>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre style="font-size:13px;"><span class="kw">class</span> <span class="fn">Car</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>, <span class="var">model</span>, <span class="var">year</span>,
+                 <span class="var">color</span>, <span class="var">for_sale</span>):
+        <span class="self">self</span><span class="op">.</span><span class="var">model</span>    <span class="op">=</span> <span class="var">model</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">year</span>     <span class="op">=</span> <span class="var">year</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">color</span>    <span class="op">=</span> <span class="var">color</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">for_sale</span> <span class="op">=</span> <span class="var">for_sale</span>
+
+<span class="var">car1</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Mustang"</span>, <span class="nm">2024</span>, <span class="st">"red"</span>, <span class="kw">False</span>)
+<span class="var">car2</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Corvette"</span>, <span class="nm">2025</span>, <span class="st">"blue"</span>, <span class="kw">True</span>)</pre>
+    </div>
+    <div>
+      <div class="card amber-border" style="margin-bottom:12px;">
+        <h3 style="font-size:16px;">Think of self as "this object"</h3>
+        <p style="font-size:14px;"><code>self.model = model</code> means <em>"Give this object the model that was passed in."</em></p>
+      </div>
+      <div class="info-box" style="font-size:13px; margin-bottom:12px;">
+        💡 Python passes <code>self</code> automatically. You do not write it when creating the object.
+      </div>
+      <div class="danger-box" style="font-size:13px;">
+        ❌ <code>model = model</code> creates a local variable, not an attribute. Always use <code>self.model</code>.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">12 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 13 - MANY OBJECTS FROM ONE CLASS
+======================================== -->
+<div class="slide content" style="padding:36px 54px;">
+  <h2 style="margin-bottom:12px;">Many Objects from One Class 🚗🚙🚕</h2>
+  <p style="margin-bottom:14px;">The same blueprint can create unlimited objects. Each object is independent and stores its own data.</p>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre style="font-size:13px;"><span class="kw">class</span> <span class="fn">Car</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>, <span class="var">model</span><span class="op">:</span> <span class="ty">str</span>,
+                 <span class="var">year</span><span class="op">:</span> <span class="ty">int</span>, <span class="var">color</span><span class="op">:</span> <span class="ty">str</span>,
+                 <span class="var">for_sale</span><span class="op">:</span> <span class="ty">bool</span>) <span class="op">-&gt;</span> <span class="ty">None</span>:
+        <span class="self">self</span><span class="op">.</span><span class="var">model</span>    <span class="op">=</span> <span class="var">model</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">year</span>     <span class="op">=</span> <span class="var">year</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">color</span>    <span class="op">=</span> <span class="var">color</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">for_sale</span> <span class="op">=</span> <span class="var">for_sale</span>
+
+<span class="var">car1</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Mustang"</span>, <span class="nm">2024</span>, <span class="st">"red"</span>, <span class="kw">False</span>)
+<span class="var">car2</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Corvette"</span>, <span class="nm">2025</span>, <span class="st">"blue"</span>, <span class="kw">True</span>)
+<span class="var">car3</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Charger"</span>, <span class="nm">2026</span>, <span class="st">"black"</span>, <span class="kw">False</span>)
+
+<span class="fn">print</span>(<span class="var">car1</span><span class="op">.</span><span class="var">model</span>)  <span class="cm"># Mustang</span>
+<span class="fn">print</span>(<span class="var">car2</span><span class="op">.</span><span class="var">model</span>)  <span class="cm"># Corvette</span>
+<span class="fn">print</span>(<span class="var">car3</span><span class="op">.</span><span class="var">model</span>)  <span class="cm"># Charger</span></pre>
+    </div>
+    <div>
+      <div class="trace">
+        <div><span class="arrow">car1</span> owns <span class="st">"Mustang"</span></div>
+        <div><span class="arrow">car2</span> owns <span class="st">"Corvette"</span></div>
+        <div><span class="arrow">car3</span> owns <span class="st">"Charger"</span></div>
+      </div>
+      <div class="success-box" style="font-size:13px; margin-top:12px;">
+        ✅ Changing <code>car1.color</code> does <strong>not</strong> change <code>car2.color</code>.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">13 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 14 - METHODS
+======================================== -->
+<div class="slide section-intro">
+  <div class="panel green">
+    <div class="section-emoji">🎬</div>
+    <div class="section-label">Methods</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">Functions that belong to objects.</div>
+  </div>
+  <div class="body">
+    <h2>Methods in Action</h2>
+    <p style="margin-bottom:14px;">A <strong>method</strong> is a function defined inside a class. The first parameter is always <code>self</code>, and you call it with dot notation.</p>
+    <pre style="font-size:13px;"><span class="kw">class</span> <span class="fn">Car</span>:
+    <span class="cm"># ... __init__ here ...</span>
+
+    <span class="kw">def</span> <span class="fn">drive</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ty">None</span>:
+        <span class="fn">print</span>(<span class="st">f"You drive the </span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">color</span><span class="op">}</span><span class="st"> </span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">model</span><span class="op">}</span><span class="st">"</span>)
+
+    <span class="kw">def</span> <span class="fn">stop</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ty">None</span>:
+        <span class="fn">print</span>(<span class="st">f"You stop the </span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">color</span><span class="op">}</span><span class="st"> </span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">model</span><span class="op">}</span><span class="st">"</span>)
+
+<span class="var">car1</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Mustang"</span>, <span class="nm">2024</span>, <span class="st">"red"</span>, <span class="kw">False</span>)
+<span class="var">car1</span><span class="op">.</span><span class="fn">drive</span>()  <span class="cm"># You drive the red Mustang</span>
+<span class="var">car1</span><span class="op">.</span><span class="fn">stop</span>()   <span class="cm"># You stop the red Mustang</span></pre>
+    <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+      <div class="pill pill-green">method = function in a class</div>
+      <div class="pill pill-teal">first parameter is self</div>
+      <div class="pill pill-blue">call with object.method()</div>
+    </div>
+  </div>
+  <div class="page-num">14 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 15 - METHODS WITH MORE DETAIL
+======================================== -->
+<div class="slide dark">
+  <h2 style="color:#2dd4bf; margin-bottom:14px;">Methods with More Detail 🎬</h2>
+  <p style="margin-bottom:14px;">A method can use all of an object's attributes at once. The <code>describe()</code> method prints the full picture.</p>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre style="font-size:12px;"><span class="kw">class</span> <span class="fn">Car</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>, <span class="var">model</span><span class="op">:</span> <span class="ty">str</span>,
+                 <span class="var">year</span><span class="op">:</span> <span class="ty">int</span>, <span class="var">color</span><span class="op">:</span> <span class="ty">str</span>,
+                 <span class="var">for_sale</span><span class="op">:</span> <span class="ty">bool</span>) <span class="op">-&gt;</span> <span class="ty">None</span>:
+        <span class="self">self</span><span class="op">.</span><span class="var">model</span>    <span class="op">=</span> <span class="var">model</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">year</span>     <span class="op">=</span> <span class="var">year</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">color</span>    <span class="op">=</span> <span class="var">color</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">for_sale</span> <span class="op">=</span> <span class="var">for_sale</span>
+
+    <span class="kw">def</span> <span class="fn">drive</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ty">None</span>:
+        <span class="fn">print</span>(<span class="st">f"You drive the </span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">color</span><span class="op">}</span><span class="st"> </span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">model</span><span class="op">}</span><span class="st">"</span>)
+
+    <span class="kw">def</span> <span class="fn">stop</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ty">None</span>:
+        <span class="fn">print</span>(<span class="st">f"You stop the </span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">color</span><span class="op">}</span><span class="st"> </span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">model</span><span class="op">}</span><span class="st">"</span>)
+
+    <span class="kw">def</span> <span class="fn">describe</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ty">None</span>:
+        <span class="fn">print</span>(<span class="st">f"</span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">year</span><span class="op">}</span><span class="st"> </span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">color</span><span class="op">}</span><span class="st"> </span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">model</span><span class="op">}</span><span class="st">"</span>)</pre>
+    </div>
+    <div>
+      <pre style="font-size:12px;"><span class="var">car1</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Mustang"</span>, <span class="nm">2024</span>, <span class="st">"red"</span>, <span class="kw">False</span>)
+<span class="var">car2</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Corvette"</span>, <span class="nm">2025</span>, <span class="st">"blue"</span>, <span class="kw">True</span>)
+
+<span class="var">car1</span><span class="op">.</span><span class="fn">drive</span>()
+<span class="var">car1</span><span class="op">.</span><span class="fn">stop</span>()
+<span class="var">car1</span><span class="op">.</span><span class="fn">describe</span>()
+
+<span class="var">car2</span><span class="op">.</span><span class="fn">describe</span>()</pre>
+      <div class="success-box" style="font-size:12px; margin-top:10px;">
+        ✅ Each method uses <code>self</code> to read the attributes of the car that called it.
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:14px; background:#1e293b; border-radius:10px; padding:10px 18px; font-size:13px; color:#2dd4bf; font-weight:600; border-left:3px solid #0d9488;">
+    💡 <code>self</code> is always first. It lets the method say "my model" and "my color".
+  </div>
+  <div class="page-num">15 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 16 - ORGANIZING CODE
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:12px;">Organizing Code in Separate Files 📁</h2>
+  <p style="margin-bottom:16px;">Classes can be placed in their own Python files and imported wherever they are needed. This keeps projects clean and reusable.</p>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <div style="font-size:11px; font-weight:700; color:#64748b; letter-spacing:2px; margin-bottom:10px;">car.py</div>
+      <pre style="font-size:12px;"><span class="kw">class</span> <span class="fn">Car</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>, <span class="var">model</span><span class="op">:</span> <span class="ty">str</span>,
+                 <span class="var">year</span><span class="op">:</span> <span class="ty">int</span>, <span class="var">color</span><span class="op">:</span> <span class="ty">str</span>,
+                 <span class="var">for_sale</span><span class="op">:</span> <span class="ty">bool</span>) <span class="op">-&gt;</span> <span class="ty">None</span>:
+        <span class="self">self</span><span class="op">.</span><span class="var">model</span>    <span class="op">=</span> <span class="var">model</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">year</span>     <span class="op">=</span> <span class="var">year</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">color</span>    <span class="op">=</span> <span class="var">color</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">for_sale</span> <span class="op">=</span> <span class="var">for_sale</span>
+
+    <span class="kw">def</span> <span class="fn">drive</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ty">None</span>:
+        <span class="fn">print</span>(<span class="st">f"You drive the </span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">color</span><span class="op">}</span><span class="st"> </span><span class="op">{</span><span class="self">self</span><span class="op">.</span><span class="var">model</span><span class="op">}</span><span class="st">"</span>)</pre>
+    </div>
+    <div>
+      <div style="font-size:11px; font-weight:700; color:#64748b; letter-spacing:2px; margin-bottom:10px;">main.py</div>
+      <pre style="font-size:12px;"><span class="kw">from</span> car <span class="kw">import</span> <span class="fn">Car</span>
+
+<span class="var">car1</span> <span class="op">=</span> <span class="fn">Car</span>(<span class="st">"Mustang"</span>, <span class="nm">2024</span>, <span class="st">"red"</span>, <span class="kw">False</span>)
+
+<span class="var">car1</span><span class="op">.</span><span class="fn">drive</span>()</pre>
+      <div class="info-box" style="font-size:13px; margin-top:12px;">
+        💡 Put the class in <code>car.py</code>, then import it with <code>from car import Car</code>.
+      </div>
+    </div>
+  </div>
+  <div class="success-box" style="font-size:13px; margin-top:12px;">
+    ✅ Separate files make your code easier to read, reuse, and maintain.
+  </div>
+  <div class="page-num">16 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 17 - COMMON MISTAKES
+======================================== -->
+<div class="slide content" style="padding:34px 54px;">
+  <h2 style="margin-bottom:12px;">Common Mistakes — Don't Fall For These! ⚠️</h2>
+  <div class="grid-2" style="gap:12px;">
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div class="card rose-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#be185d; margin-bottom:5px;">❌ Forgetting self in a method</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#fef2f2; padding:7px; border-radius:6px; color:#991b1b;">
+          def drive(): ... &nbsp; # TypeError!<br>
+          def drive(self): ... # correct
+        </div>
+      </div>
+      <div class="card orange-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#ea580c; margin-bottom:5px;">❌ Using model instead of self.model</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#fff7ed; padding:7px; border-radius:6px; color:#9a3412;">
+          self.model = model &nbsp; # stores on object<br>
+          model = model &nbsp; &nbsp; &nbsp; &nbsp; # local var, gone!
+        </div>
+      </div>
+      <div class="card amber-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#d97706; margin-bottom:5px;">❌ Typo in attribute name</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#fffbeb; padding:7px; border-radius:6px; color:#92400e;">
+          car1.modle &nbsp; # AttributeError!<br>
+          car1.model &nbsp; # correct
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div class="card teal-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#0d9488; margin-bottom:5px;">❌ Calling a method without ()</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#f0fdfa; padding:7px; border-radius:6px; color:#134e4a;">
+          car1.drive &nbsp; # gives the method object<br>
+          car1.drive() # runs it!
+        </div>
+      </div>
+      <div class="card violet-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#6d28d9; margin-bottom:5px;">❌ Lowercase class names</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#faf5ff; padding:7px; border-radius:6px; color:#4c1d95;">
+          class car: &nbsp; &nbsp; &nbsp; &nbsp; # not convention<br>
+          class Car: &nbsp; &nbsp; &nbsp; &nbsp; # PascalCase
+        </div>
+      </div>
+      <div class="card blue-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#0284c7; margin-bottom:5px;">❌ Confusing class and object</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#eff6ff; padding:7px; border-radius:6px; color:#1e40af;">
+          Car is the blueprint.<br>
+          car1 = Car() is a real object.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-num">17 / 18</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 18 - SUMMARY
+======================================== -->
+<div class="slide content" style="padding:34px 54px;">
+  <h2 style="margin-bottom:12px;">Day 8 Summary — Your OOP Checklist ✅</h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+    <div class="card teal-border" style="padding:12px 16px;">
+      <div style="font-size:20px; margin-bottom:5px;">🏠</div>
+      <div style="font-weight:700; color:#0d9488; font-size:13px;">Object</div>
+      <ul style="margin-top:5px;">
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>A bundle of attributes + methods</li>
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>Real-world examples: phone, cup, book</li>
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>Each object is independent</li>
+      </ul>
+    </div>
+    <div class="card purple-border" style="padding:12px 16px;">
+      <div style="font-size:20px; margin-bottom:5px;">📐</div>
+      <div style="font-weight:700; color:#7c3aed; font-size:13px;">Class</div>
+      <ul style="margin-top:5px;">
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>The blueprint for objects</li>
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>Name it with PascalCase</li>
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>Use <code>class Car:</code></li>
+      </ul>
+    </div>
+    <div class="card amber-border" style="padding:12px 16px;">
+      <div style="font-size:20px; margin-bottom:5px;">📦</div>
+      <div style="font-weight:700; color:#d97706; font-size:13px;">Attributes</div>
+      <ul style="margin-top:5px;">
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>What an object HAS</li>
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>Access with <code>car1.model</code></li>
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>Set inside <code>__init__</code></li>
+      </ul>
+    </div>
+    <div class="card violet-border" style="padding:12px 16px;">
+      <div style="font-size:20px; margin-bottom:5px;">⚙️</div>
+      <div style="font-weight:700; color:#6d28d9; font-size:13px;">__init__ &amp; self</div>
+      <ul style="margin-top:5px;">
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span><code>__init__</code> runs automatically</li>
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span><code>self</code> is "this object"</li>
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>Always use <code>self.attribute</code></li>
+      </ul>
+    </div>
+    <div class="card blue-border" style="padding:12px 16px;">
+      <div style="font-size:20px; margin-bottom:5px;">🏷️</div>
+      <div style="font-weight:700; color:#0284c7; font-size:13px;">Annotations</div>
+      <ul style="margin-top:5px;">
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span><code>model: str</code>, <code>year: int</code></li>
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span><code>for_sale: bool</code></li>
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span><code>-&gt; None</code> for no return</li>
+      </ul>
+    </div>
+    <div class="card green-border" style="padding:12px 16px;">
+      <div style="font-size:20px; margin-bottom:5px;">🎬</div>
+      <div style="font-weight:700; color:#059669; font-size:13px;">Methods</div>
+      <ul style="margin-top:5px;">
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>Functions inside a class</li>
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>First parameter is <code>self</code></li>
+        <li style="font-size:11px; padding:2px 0;"><span class="icon">•</span>Use f-strings with <code>self</code></li>
+      </ul>
+    </div>
+  </div>
+  <div class="highlight-box" style="font-size:13px; margin-bottom:10px;">
+    🎉 Great job! You can now build your own classes and objects. <strong>Tomorrow: Advanced OOP — inheritance, polymorphism, abstraction, and special methods.</strong>
+  </div>
+  <div class="page-num">18 / 18</div>
+</div>
+
+
+<script>
+(function() {
+  const SLIDE_W = 1122;
+  const SLIDE_H = 794;
+  let presentMode = false;
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  let currentSlide = 0;
+
+  function updateScale() {
+    if (!presentMode) return;
+    const scale = Math.min(window.innerWidth / SLIDE_W, window.innerHeight / SLIDE_H);
+    document.documentElement.style.setProperty('--present-scale', scale);
+  }
+
+  function togglePresent() {
+    presentMode = !presentMode;
+    document.body.classList.toggle('present-mode', presentMode);
+    updateScale();
+    if (presentMode && slides[currentSlide]) {
+      slides[currentSlide].scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+  }
+
+  function scrollToSlide(index) {
+    if (index >= 0 && index < slides.length) {
+      slides[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      currentSlide = index;
+    }
+  }
+
+  window.addEventListener('resize', updateScale);
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (e.key === 'f' || e.key === 'F') {
+      e.preventDefault();
+      togglePresent();
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      scrollToSlide(currentSlide + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      scrollToSlide(currentSlide - 1);
+    }
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        currentSlide = slides.indexOf(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  slides.forEach(slide => observer.observe(slide));
+
+  const hint = document.createElement('div');
+  hint.className = 'controls-hint show';
+  hint.textContent = "Press 'F' for fullscreen mode • Arrow keys to navigate";
+  document.body.appendChild(hint);
+  setTimeout(() => hint.classList.remove('show'), 6000);
+})();
+</script>
+</body>
+</html>

@@ -485,40 +485,7 @@ print("Have a great day!")
 </div>
 
 
-<!-- ════════════════════════════════════════
-  SLIDE 11 — DEFAULTS IN ACTION
-════════════════════════════════════════ -->
-<div class="slide dark">
-  <h2 style="color:#fbbf24; margin-bottom:14px;">Defaults Make Functions Flexible 🛠️</h2>
-  <div class="grid-2" style="gap:22px;">
-    <div>
-      <div style="font-size:11px; font-weight:700; color:#64748b; letter-spacing:2px; margin-bottom:10px;">MIXING REQUIRED AND OPTIONAL</div>
-      <pre><span class="kw">def</span> <span class="fn">make_smoothie</span><span class="op">(</span><span class="var">fruit</span><span class="op">,</span> <span class="var">size</span><span class="op">=</span><span class="st">"medium"</span><span class="op">,</span> <span class="var">ice</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="op">:</span>
-    <span class="var">ice_txt</span> <span class="op">=</span> <span class="st">"with ice"</span> <span class="key">if</span> <span class="var">ice</span> <span class="key">else</span> <span class="st">"no ice"</span>
-    <span class="fn">print</span>(<span class="st">f"</span><span style="color:#f472b6;">{</span><span style="color:#38bdf8;">size</span><span style="color:#f472b6;">}</span><span class="st"> </span><span style="color:#f472b6;">{</span><span style="color:#38bdf8;">fruit</span><span style="color:#f472b6;">}</span><span class="st"> smoothie (</span><span style="color:#f472b6;">{</span><span style="color:#38bdf8;">ice_txt</span><span style="color:#f472b6;">}</span><span class="st">)"</span>)
 
-<span class="fn">make_smoothie</span>(<span class="st">"mango"</span>)                    <span class="cm"># medium, with ice</span>
-<span class="fn">make_smoothie</span>(<span class="st">"banana"</span><span class="op">,</span> <span class="st">"large"</span>)          <span class="cm"># large, with ice</span>
-<span class="fn">make_smoothie</span>(<span class="st">"berry"</span><span class="op">,</span> <span class="st">"small"</span><span class="op">,</span> <span class="key">False</span>)   <span class="cm"># small, no ice</span></pre>
-    </div>
-    <div>
-      <div style="font-size:11px; font-weight:700; color:#64748b; letter-spacing:2px; margin-bottom:10px;">⚠️ GOTCHA: MUTABLE DEFAULTS</div>
-      <div style="background:#1e293b; border-radius:10px; padding:14px;">
-        <p style="font-size:13px; color:#f87171; margin-bottom:10px;">NEVER do this!</p>
-        <pre style="background:transparent; padding:0; font-size:12px; margin-bottom:12px;"><span class="kw">def</span> <span class="fn">bad</span><span class="op">(</span><span class="var">item</span><span class="op">,</span> <span class="var">lst</span><span class="op">=</span><span class="op">[</span><span class="op">]</span><span class="op">)</span><span class="op">:</span>   <span class="cm"># DANGER! Shared list!</span>
-    <span class="var">lst</span><span class="op">.</span><span class="fn">append</span>(<span class="var">item</span>)
-    <span class="kw">return</span> <span class="var">lst</span></pre>
-        <p style="font-size:13px; color:#34d399; margin-bottom:10px;">Do this instead:</p>
-        <pre style="background:transparent; padding:0; font-size:12px;"><span class="kw">def</span> <span class="fn">good</span><span class="op">(</span><span class="var">item</span><span class="op">,</span> <span class="var">lst</span><span class="op">=</span><span class="key">None</span><span class="op">)</span><span class="op">:</span>
-    <span class="key">if</span> <span class="var">lst</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>
-        <span class="var">lst</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span>
-    <span class="var">lst</span><span class="op">.</span><span class="fn">append</span>(<span class="var">item</span>)
-    <span class="kw">return</span> <span class="var">lst</span></pre>
-      </div>
-    </div>
-  </div>
-  <div class="page-num">11 / 18</div>
-</div>
 
 
 <!-- ════════════════════════════════════════

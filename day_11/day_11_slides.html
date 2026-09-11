@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 11: Exception Handling 🐍</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Fira+Code:wght@400;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    @page { size: A4 landscape; margin: 0; }
+
+    body { font-family: 'Poppins', 'Segoe UI', sans-serif; background: #e8e8e8; }
+
+    .slide {
+      width: 297mm;
+      height: 210mm;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      page-break-after: always;
+      break-after: page;
+    }
+    @media screen { .slide { margin: 20px auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); } }
+
+    .blob { position: absolute; border-radius: 50%; opacity: 0.15; pointer-events: none; }
+
+    /* -- Themes --- */
+    .hero {
+      background: linear-gradient(135deg, #dc2626 0%, #ea580c 50%, #d97706 100%);
+      color: white; justify-content: center; align-items: center; text-align: center; padding: 60px;
+    }
+    .hero .blob1 { width: 300px; height: 300px; background: white; top: -90px; right: -70px; }
+    .hero .blob2 { width: 220px; height: 220px; background: #fed7aa; bottom: -70px; left: -50px; }
+
+    .section-intro { background: white; flex-direction: row; }
+    .section-intro .panel {
+      width: 36%; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; padding: 50px 28px; color: white;
+    }
+    .section-intro .body { width: 64%; padding: 44px 52px; display: flex; flex-direction: column; justify-content: center; }
+
+    .content { background: white; padding: 48px 62px; }
+    .dark { background: #0f172a; color: #e2e8f0; padding: 46px 62px; }
+
+    /* -- Gradients --- */
+    .purple  { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .green   { background: linear-gradient(135deg, #059669, #10b981); }
+    .blue    { background: linear-gradient(135deg, #0284c7, #0ea5e9); }
+    .amber   { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .teal    { background: linear-gradient(135deg, #0d9488, #14b8a6); }
+    .violet  { background: linear-gradient(135deg, #6d28d9, #8b5cf6); }
+    .rose    { background: linear-gradient(135deg, #be185d, #e11d48); }
+    .indigo  { background: linear-gradient(135deg, #3730a3, #4f46e5); }
+    .orange  { background: linear-gradient(135deg, #c2410c, #ea580c); }
+    .fuchsia { background: linear-gradient(135deg, #86198f, #c026d3); }
+    .cyan    { background: linear-gradient(135deg, #0e7490, #06b6d4); }
+    .red     { background: linear-gradient(135deg, #b91c1c, #dc2626); }
+
+    /* -- Typography --- */
+    .slide-tag { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; opacity: 0.7; margin-bottom: 10px; }
+    .slide-title { font-size: 52px; font-weight: 900; line-height: 1.1; }
+    .slide-subtitle { font-size: 22px; font-weight: 400; opacity: 0.85; margin-top: 14px; }
+    .section-emoji { font-size: 88px; line-height: 1; margin-bottom: 14px; }
+    .section-label { font-size: 19px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+
+    h2 { font-size: 31px; font-weight: 800; color: #1e1b4b; margin-bottom: 20px; }
+    h3 { font-size: 20px; font-weight: 700; color: #1e1b4b; margin-bottom: 10px; }
+    .dark h2 { color: #e2e8f0; }
+    .dark h3 { color: #94a3b8; }
+
+    p { font-size: 16px; line-height: 1.65; color: #374151; }
+    .dark p { color: #cbd5e1; }
+
+    ul { list-style: none; margin-top: 6px; }
+    ul li { font-size: 16px; color: #374151; padding: 5px 0; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+    .dark ul li { color: #cbd5e1; }
+    ul li .icon { flex-shrink: 0; font-size: 17px; margin-top: 1px; }
+
+    /* -- Code --- */
+    pre {
+      background: #0f172a; border-radius: 12px; padding: 18px 22px;
+      font-family: 'Fira Code', 'Consolas', monospace; font-size: 14px;
+      line-height: 1.75; color: #e2e8f0; overflow: hidden;
+    }
+    .dark pre { background: #1e293b; }
+    pre .kw   { color: #c084fc; }
+    pre .fn   { color: #34d399; }
+    pre .st   { color: #fbbf24; }
+    pre .cm   { color: #64748b; }
+    pre .nm   { color: #38bdf8; }
+    pre .op   { color: #f472b6; }
+    pre .var  { color: #e2e8f0; }
+    pre .hl   { background: rgba(251,191,36,0.15); display: block; margin: 0 -22px; padding: 0 22px; }
+    pre .self { color: #fb923c; }
+    pre .dec  { color: #67e8f9; }
+    pre .exc  { color: #f87171; }
+
+    /* -- Layouts --- */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+    /* -- Cards --- */
+    .card { background: #f8fafc; border-radius: 14px; padding: 18px 22px; border-left: 5px solid #4f46e5; }
+    .card.green-border   { border-left-color: #059669; }
+    .card.blue-border    { border-left-color: #0284c7; }
+    .card.amber-border   { border-left-color: #d97706; }
+    .card.teal-border    { border-left-color: #0d9488; }
+    .card.violet-border  { border-left-color: #6d28d9; }
+    .card.rose-border    { border-left-color: #be185d; }
+    .card.indigo-border  { border-left-color: #4f46e5; }
+    .card.orange-border  { border-left-color: #ea580c; }
+    .card.purple-border  { border-left-color: #7c3aed; }
+    .card.fuchsia-border { border-left-color: #c026d3; }
+    .card.cyan-border    { border-left-color: #06b6d4; }
+    .card.red-border     { border-left-color: #dc2626; }
+
+    /* -- Pills --- */
+    .pill { display: inline-block; padding: 4px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .pill-green   { background: #d1fae5; color: #065f46; }
+    .pill-blue    { background: #dbeafe; color: #1e40af; }
+    .pill-amber   { background: #fef3c7; color: #92400e; }
+    .pill-teal    { background: #ccfbf1; color: #134e4a; }
+    .pill-violet  { background: #ede9fe; color: #4c1d95; }
+    .pill-rose    { background: #ffe4e6; color: #9f1239; }
+    .pill-orange  { background: #ffedd5; color: #9a3412; }
+    .pill-purple  { background: #f3e8ff; color: #6b21a8; }
+    .pill-indigo  { background: #e0e7ff; color: #3730a3; }
+    .pill-cyan    { background: #cffafe; color: #155e75; }
+    .pill-red     { background: #fee2e2; color: #991b1b; }
+
+    /* -- Highlight boxes --- */
+    .highlight-box {
+      background: #fef9c3; border: 2px solid #fde047; border-radius: 10px;
+      padding: 12px 18px; font-size: 15px; color: #713f12; margin-top: 16px; font-weight: 600;
+    }
+    .danger-box {
+      background: #fef2f2; border: 2px solid #fca5a5; border-radius: 10px;
+      padding: 12px 18px; font-size: 15px; color: #991b1b; margin-top: 16px; font-weight: 600;
+    }
+    .info-box {
+      background: #eff6ff; border: 2px solid #93c5fd; border-radius: 10px;
+      padding: 12px 18px; font-size: 15px; color: #1e40af; margin-top: 16px; font-weight: 600;
+    }
+    .success-box {
+      background: #f0fdf4; border: 2px solid #86efac; border-radius: 10px;
+      padding: 12px 18px; font-size: 15px; color: #14532d; margin-top: 16px; font-weight: 600;
+    }
+
+    /* -- Step trace --- */
+    .trace { font-family: 'Fira Code', monospace; font-size: 13px; background: #f1f5f9; border-radius: 10px; padding: 14px 18px; line-height: 2; }
+    .trace .step  { display: flex; gap: 14px; align-items: center; }
+    .trace .arrow { color: #0284c7; font-weight: 700; }
+    .trace .yes   { color: #059669; font-weight: 700; }
+    .trace .no    { color: #dc2626; font-weight: 700; }
+
+    /* -- Page number --- */
+    .page-num { position: absolute; bottom: 16px; right: 26px; font-size: 11px; font-weight: 600; opacity: 0.32; letter-spacing: 1px; }
+
+    /* -- Present mode --- */
+    :root { --present-scale: 1; }
+    body.present-mode {
+      background: #111;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    body.present-mode::-webkit-scrollbar { display: none; }
+    body.present-mode .slide {
+      transform: scale(var(--present-scale));
+      transform-origin: top center;
+      margin: 0 auto calc(794px * (var(--present-scale) - 1) + 40px * var(--present-scale));
+      box-shadow: none;
+      border-radius: 0;
+    }
+    body.present-mode .page-num { display: none; }
+
+    .controls-hint {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-family: 'Poppins', sans-serif;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .controls-hint.show { opacity: 1; }
+    body.present-mode .controls-hint { display: none; }
+  </style>
+</head>
+<body>
+
+
+<!-- ========================================
+  SLIDE 1 - TITLE
+======================================== -->
+<div class="slide hero">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="slide-tag">Python Crash Course - Day 11</div>
+  <div class="slide-title">Exception Handling</div>
+  <div class="slide-subtitle">Dealing with errors gracefully, instead of crashing</div>
+  <div style="margin-top:30px; font-size:60px; line-height:1;">⚠️🐍</div>
+  <div style="margin-top:26px; font-size:12px; opacity:0.6; font-weight:600; letter-spacing:2px; text-transform:uppercase;">
+    Keep your programs running even when something goes wrong.
+  </div>
+  <div class="page-num">1 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 2 - AGENDA
+======================================== -->
+<div class="slide content" style="padding:36px 56px;">
+  <h2 style="margin-bottom:12px;">Today's Roadmap 🗺️</h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:14px;">
+    <div class="card red-border">
+      <div style="font-size:28px; margin-bottom:6px;">💥</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">Why Programs Crash</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">Understanding what an exception is.</div>
+    </div>
+    <div class="card orange-border">
+      <div style="font-size:28px; margin-bottom:6px;">🛡️</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">try / except</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">Catching errors before they crash your program.</div>
+    </div>
+    <div class="card amber-border">
+      <div style="font-size:28px; margin-bottom:6px;">🎯</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">Specific Exceptions</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">ValueError, ZeroDivisionError, and more.</div>
+    </div>
+    <div class="card teal-border">
+      <div style="font-size:28px; margin-bottom:6px;">🔀</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">else &amp; finally</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">Code that runs only on success, or always.</div>
+    </div>
+    <div class="card violet-border">
+      <div style="font-size:28px; margin-bottom:6px;">🚨</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">raise</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">Triggering your own exceptions on purpose.</div>
+    </div>
+    <div class="card rose-border">
+      <div style="font-size:28px; margin-bottom:6px;">🏷️</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">Custom Exceptions</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">Creating your own named error types.</div>
+    </div>
+  </div>
+  <div class="highlight-box" style="font-size:13px; margin-top:12px;">
+    📌 Goal for today: write programs that handle bad input and unexpected situations without crashing.
+  </div>
+  <div class="page-num">2 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 3 - RECAP
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Quick Recap: Yesterday's File Handling 🔙</h2>
+  <div class="grid-2" style="gap:24px;">
+    <div>
+      <h3>What We Covered on Day 10</h3>
+      <ul>
+        <li><span class="icon">✅</span>Private attributes (__age) and getter/setter methods.</li>
+        <li><span class="icon">✅</span>open(), the with statement, and file modes "r", "w", "a", "r+".</li>
+        <li><span class="icon">✅</span>Reading and writing files, and deleting them with os.remove().</li>
+      </ul>
+      <div class="info-box" style="font-size:13px; margin-top:14px;">
+        💡 Today's question: what happens when something goes wrong while our code is running — like a missing file, or bad user input?
+      </div>
+    </div>
+    <div>
+      <pre><span class="kw">import</span> <span class="var">os</span>
+
+<span class="kw">if</span> <span class="var">os</span><span class="op">.</span><span class="var">path</span><span class="op">.</span><span class="fn">exists</span>(<span class="st">"demofile.txt"</span>)<span class="op">:</span>
+    <span class="var">os</span><span class="op">.</span><span class="fn">remove</span>(<span class="st">"demofile.txt"</span>)
+<span class="kw">else</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"The file does not exist"</span>)
+
+<span class="cm"># What if we open a file that does not exist,</span>
+<span class="cm"># without checking first?</span>
+<span class="var">file</span> <span class="op">=</span> <span class="fn">open</span>(<span class="st">"missing.txt"</span><span class="op">,</span> <span class="st">"r"</span>)
+<span class="cm"># FileNotFoundError - the program crashes!</span></pre>
+    </div>
+  </div>
+  <div class="page-num">3 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 4 - SECTION INTRO: EXCEPTION HANDLING
+======================================== -->
+<div class="slide section-intro">
+  <div class="panel red">
+    <div class="section-emoji">⚠️</div>
+    <div class="section-label">Exception<br>Handling</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">Handle errors instead of crashing.</div>
+  </div>
+  <div class="body">
+    <h2>The Big Idea</h2>
+    <p style="margin-bottom:14px;">An <strong>exception</strong> is an error that happens while a program is running. Without handling, Python stops the entire program immediately. <strong>Exception handling</strong> lets you catch the error and decide what to do instead.</p>
+    <ul style="margin-bottom:14px;">
+      <li><span class="icon">⚠️</span>Bad user input, missing files, and dividing by zero all cause exceptions.</li>
+      <li><span class="icon">⚠️</span>try/except lets your program recover and keep running.</li>
+    </ul>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <div class="pill pill-red">errors happen at runtime</div>
+      <div class="pill pill-orange">catch them with try/except</div>
+      <div class="pill pill-amber">keep the program alive</div>
+    </div>
+  </div>
+  <div class="page-num">4 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 5 - WITHOUT TRY/EXCEPT
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">What Happens Without try/except? 💥</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="var">age</span> <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"Enter your age: "</span>))
+<span class="fn">print</span>(<span class="st">f"You are {age} years old."</span>)
+
+<span class="cm"># If the user types "abc" instead of a number:</span>
+<span class="exc">ValueError</span><span class="op">:</span> <span class="var">invalid</span> <span class="var">literal</span> <span class="kw">for</span> <span class="fn">int</span>() <span class="kw">with</span> <span class="var">base</span> <span class="nm">10</span><span class="op">:</span> <span class="st">'abc'</span>
+<span class="cm"># The program stops here. Nothing after this line runs!</span></pre>
+    </div>
+    <div>
+      <h3>Why This Is a Problem</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">💥</span>One bad input crashes the entire program.</li>
+        <li><span class="icon">💥</span>Any code after the error never runs.</li>
+        <li><span class="icon">💥</span>The user sees a scary, confusing error message.</li>
+      </ul>
+      <div class="danger-box" style="font-size:13px;">
+        ⚠️ Real programs must expect that users, files, and networks will not always behave perfectly.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">5 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 6 - TRY/EXCEPT BASICS
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">try / except Basics 🛡️</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">try</span><span class="op">:</span>
+    <span class="var">age</span> <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"Enter your age: "</span>))
+    <span class="fn">print</span>(<span class="st">f"You are {age} years old."</span>)
+<span class="kw">except</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"That was not a valid number!"</span>)
+
+<span class="cm"># Typing "abc" now prints a friendly message</span>
+<span class="cm"># instead of crashing the program.</span></pre>
+    </div>
+    <div>
+      <h3>How try/except Works</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">1️⃣</span>Python runs the code inside try first.</li>
+        <li><span class="icon">2️⃣</span>If an error happens, it immediately jumps to except.</li>
+        <li><span class="icon">3️⃣</span>If there is no error, the except block is skipped entirely.</li>
+      </ul>
+      <div class="success-box" style="font-size:13px;">
+        ✅ The program keeps running after the try/except block, no matter what happened inside it.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">6 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 7 - CATCHING SPECIFIC EXCEPTIONS
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Catching Specific Exceptions 🎯</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">try</span><span class="op">:</span>
+    <span class="var">number</span> <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"Enter a number: "</span>))
+    <span class="fn">print</span>(<span class="nm">10</span> <span class="op">/</span> <span class="var">number</span>)
+<span class="kw">except</span> <span class="exc">ValueError</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"That is not a number!"</span>)</pre>
+      <div class="info-box" style="font-size:13px; margin-top:12px;">
+        💡 ValueError is just one type of exception. Naming it means we only catch that specific problem.
+      </div>
+    </div>
+    <div>
+      <h3>Why Name the Exception?</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">🎯</span>except ValueError: only catches invalid conversions like int("abc").</li>
+        <li><span class="icon">🎯</span>A bare except: catches everything — even mistakes in your own code!</li>
+        <li><span class="icon">🎯</span>Being specific makes bugs easier to find.</li>
+      </ul>
+      <div class="danger-box" style="font-size:13px;">
+        ⚠️ This example still has a problem: dividing by 0 raises a DIFFERENT exception that we are not catching yet. Next slide fixes that.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">7 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 8 - MULTIPLE EXCEPT BLOCKS
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Multiple except Blocks 🔀</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">try</span><span class="op">:</span>
+    <span class="var">number</span> <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"Enter a number: "</span>))
+    <span class="var">result</span> <span class="op">=</span> <span class="nm">10</span> <span class="op">/</span> <span class="var">number</span>
+    <span class="fn">print</span>(<span class="var">result</span>)
+<span class="kw">except</span> <span class="exc">ValueError</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"That is not a number!"</span>)
+<span class="kw">except</span> <span class="exc">ZeroDivisionError</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"You cannot divide by zero!"</span>)</pre>
+    </div>
+    <div>
+      <h3>How Python Picks a Block</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">🔀</span>Python checks each except in order, top to bottom.</li>
+        <li><span class="icon">🔀</span>Only the block matching the exception type runs.</li>
+        <li><span class="icon">🔀</span>Typing "abc" triggers ValueError; typing "0" triggers ZeroDivisionError.</li>
+      </ul>
+      <div class="highlight-box" style="font-size:13px;">
+        📌 One try can be followed by as many except blocks as you need, one per error type.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">8 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 9 - CATCHING MULTIPLE EXCEPTIONS IN ONE LINE
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Catching Several Exceptions in One Line 📦</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="var">fruits</span> <span class="op">=</span> {<span class="st">"apple"</span><span class="op">:</span> <span class="nm">3</span><span class="op">,</span> <span class="st">"banana"</span><span class="op">:</span> <span class="nm">5</span>}
+
+<span class="kw">try</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="var">fruits</span>[<span class="st">"cherry"</span>])
+<span class="kw">except</span> (<span class="exc">KeyError</span><span class="op">,</span> <span class="exc">IndexError</span>)<span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"That item does not exist!"</span>)
+
+<span class="cm"># cherry is not a key in fruits, so KeyError happens</span>
+<span class="cm"># and this except block catches it.</span></pre>
+    </div>
+    <div>
+      <h3>Grouping Exception Types</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">📦</span>Wrap the types in parentheses, separated by commas.</li>
+        <li><span class="icon">📦</span>Use this when two different errors should be handled the same way.</li>
+        <li><span class="icon">📦</span>Saves you from repeating the same print statement twice.</li>
+      </ul>
+      <div class="info-box" style="font-size:13px;">
+        💡 If the errors need different messages, use separate except blocks instead (like the previous slide).
+      </div>
+    </div>
+  </div>
+  <div class="page-num">9 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 10 - GETTING THE ERROR MESSAGE WITH "as e"
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Getting the Error Message with "as e" 🔎</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">try</span><span class="op">:</span>
+    <span class="var">number</span> <span class="op">=</span> <span class="fn">int</span>(<span class="st">"abc"</span>)
+<span class="kw">except</span> <span class="exc">ValueError</span> <span class="kw">as</span> <span class="var">e</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"Error occurred:"</span><span class="op">,</span> <span class="var">e</span>)
+
+<span class="cm"># Error occurred: invalid literal for int()</span>
+<span class="cm"># with base 10: 'abc'</span></pre>
+    </div>
+    <div>
+      <h3>Why Capture the Exception?</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">🔎</span>as e stores the exception object in a variable named e.</li>
+        <li><span class="icon">🔎</span>Printing e shows Python's own description of what went wrong.</li>
+        <li><span class="icon">🔎</span>Very useful while debugging — you see the real reason for the failure.</li>
+      </ul>
+      <div class="highlight-box" style="font-size:13px;">
+        📌 "e" is just a variable name — you could call it anything, but "e" or "error" is the common convention.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">10 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 11 - THE else CLAUSE
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">The else Clause: Only Runs If Nothing Fails ✅</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">try</span><span class="op">:</span>
+    <span class="var">number</span> <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"Enter a number: "</span>))
+<span class="kw">except</span> <span class="exc">ValueError</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"That is not a number!"</span>)
+<span class="kw">else</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">f"Great, you entered {number}"</span>)
+
+<span class="cm"># else only runs when the try block succeeds</span>
+<span class="cm"># with NO exception at all.</span></pre>
+    </div>
+    <div>
+      <h3>Why Not Just Put It in try?</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">✅</span>else keeps the "success path" separate from the risky code.</li>
+        <li><span class="icon">✅</span>It only runs when try finishes with no error.</li>
+        <li><span class="icon">✅</span>Makes it clear which lines are "the risky part" and which are "what happens next."</li>
+      </ul>
+      <div class="info-box" style="font-size:13px;">
+        💡 else is optional — most simple programs just use try and except without it.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">11 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 12 - THE finally CLAUSE
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">The finally Clause: Always Runs 🔁</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">try</span><span class="op">:</span>
+    <span class="var">result</span> <span class="op">=</span> <span class="nm">10</span> <span class="op">/</span> <span class="nm">0</span>
+<span class="kw">except</span> <span class="exc">ZeroDivisionError</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"Cannot divide by zero!"</span>)
+<span class="kw">finally</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"Done trying the division."</span>)
+
+<span class="cm"># Cannot divide by zero!</span>
+<span class="cm"># Done trying the division.</span></pre>
+    </div>
+    <div>
+      <h3>Success or Failure, It Still Runs</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">🔁</span>finally runs whether or not an exception happened.</li>
+        <li><span class="icon">🔁</span>Great for cleanup code, like closing a file or a connection.</li>
+        <li><span class="icon">🔁</span>Runs even if the except block itself does not catch the error.</li>
+      </ul>
+      <div class="highlight-box" style="font-size:13px;">
+        📌 Think of finally as "no matter what happens above, always do this before moving on."
+      </div>
+    </div>
+  </div>
+  <div class="page-num">12 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 13 - PUTTING IT TOGETHER
+======================================== -->
+<div class="slide dark">
+  <h2 style="color:#fca5a5; margin-bottom:14px;">Putting It Together: try / except / else / finally 🧩</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre style="font-size:12.5px;"><span class="kw">try</span><span class="op">:</span>
+    <span class="var">age</span> <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"Enter your age: "</span>))
+<span class="kw">except</span> <span class="exc">ValueError</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"That is not a valid number!"</span>)
+<span class="kw">else</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">f"Your age is {age}"</span>)
+<span class="kw">finally</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"Thanks for using the program!"</span>)</pre>
+    </div>
+    <div>
+      <pre style="font-size:12.5px;"><span class="cm"># If the user enters "25":</span>
+<span class="cm"># Your age is 25</span>
+<span class="cm"># Thanks for using the program!</span>
+
+<span class="cm"># If the user enters "abc":</span>
+<span class="cm"># That is not a valid number!</span>
+<span class="cm"># Thanks for using the program!</span></pre>
+      <div style="margin-top:12px; background:#1e293b; border-radius:10px; padding:10px 18px; font-size:13px; color:#fca5a5; font-weight:600; border-left:3px solid #dc2626;">
+        🧩 try = risky code. except = handle failure. else = handle success. finally = always run.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">13 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 14 - SECTION INTRO: RAISING EXCEPTIONS
+======================================== -->
+<div class="slide section-intro">
+  <div class="panel orange">
+    <div class="section-emoji">🚨</div>
+    <div class="section-label">Raising Your Own<br>Exceptions</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">Sometimes YOU decide something is an error.</div>
+  </div>
+  <div class="body">
+    <h2>The Big Idea</h2>
+    <p style="margin-bottom:14px;">So far, Python raised exceptions for us. But sometimes your own code needs to say "this is not allowed" — for example, a negative age. The <strong>raise</strong> keyword lets you trigger an exception on purpose.</p>
+    <pre style="font-size:13px;"><span class="kw">if</span> <span class="var">age</span> <span class="op">&lt;</span> <span class="nm">0</span><span class="op">:</span>
+    <span class="kw">raise</span> <span class="exc">ValueError</span>(<span class="st">"Age cannot be negative"</span>)</pre>
+    <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+      <div class="pill pill-orange">raise ExceptionType("message")</div>
+      <div class="pill pill-amber">stops the function immediately</div>
+    </div>
+  </div>
+  <div class="page-num">14 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 15 - THE raise STATEMENT
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">The raise Statement 🚨</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">def</span> <span class="fn">set_age</span>(<span class="var">age</span>)<span class="op">:</span>
+    <span class="kw">if</span> <span class="var">age</span> <span class="op">&lt;</span> <span class="nm">0</span><span class="op">:</span>
+        <span class="kw">raise</span> <span class="exc">ValueError</span>(<span class="st">"Age cannot be negative"</span>)
+    <span class="kw">return</span> <span class="var">age</span>
+
+<span class="fn">set_age</span>(<span class="op">-</span><span class="nm">5</span>)
+<span class="cm"># ValueError: Age cannot be negative</span>
+<span class="cm"># The program stops here — unless we catch it!</span>
+
+<span class="kw">try</span><span class="op">:</span>
+    <span class="fn">set_age</span>(<span class="op">-</span><span class="nm">5</span>)
+<span class="kw">except</span> <span class="exc">ValueError</span> <span class="kw">as</span> <span class="var">e</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"Invalid age:"</span><span class="op">,</span> <span class="var">e</span>)</pre>
+    </div>
+    <div>
+      <h3>Using raise Inside Your Own Functions</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">🚨</span>raise stops the function immediately, just like a real Python error.</li>
+        <li><span class="icon">🚨</span>You choose the exception type and the message.</li>
+        <li><span class="icon">🚨</span>Whoever calls your function can catch it with try/except.</li>
+      </ul>
+      <div class="success-box" style="font-size:13px;">
+        ✅ raise lets your own functions enforce rules, the same way Python enforces its own.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">15 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 16 - CUSTOM EXCEPTION CLASSES
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Custom Exception Classes 🏷️</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">class</span> <span class="fn">NegativeAgeError</span>(<span class="fn">Exception</span>)<span class="op">:</span>
+    <span class="kw">pass</span>
+
+<span class="kw">def</span> <span class="fn">set_age</span>(<span class="var">age</span>)<span class="op">:</span>
+    <span class="kw">if</span> <span class="var">age</span> <span class="op">&lt;</span> <span class="nm">0</span><span class="op">:</span>
+        <span class="kw">raise</span> <span class="fn">NegativeAgeError</span>(<span class="st">"Age cannot be negative"</span>)
+    <span class="kw">return</span> <span class="var">age</span></pre>
+    </div>
+    <div>
+      <h3>Why Make Your Own Exception?</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">🏷️</span>A custom exception has a name that describes YOUR specific problem.</li>
+        <li><span class="icon">🏷️</span>It inherits from the built-in Exception class.</li>
+        <li><span class="icon">🏷️</span>pass means it needs no extra code — the name itself is the point.</li>
+      </ul>
+      <div class="info-box" style="font-size:13px;">
+        💡 NegativeAgeError is much clearer than a generic ValueError when other people read your code.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">16 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 17 - USING A CUSTOM EXCEPTION
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Using a Custom Exception in Practice 🎬</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">class</span> <span class="fn">NegativeAgeError</span>(<span class="fn">Exception</span>)<span class="op">:</span>
+    <span class="kw">pass</span>
+
+<span class="kw">def</span> <span class="fn">set_age</span>(<span class="var">age</span>)<span class="op">:</span>
+    <span class="kw">if</span> <span class="var">age</span> <span class="op">&lt;</span> <span class="nm">0</span><span class="op">:</span>
+        <span class="kw">raise</span> <span class="fn">NegativeAgeError</span>(<span class="st">"Age cannot be negative"</span>)
+    <span class="kw">return</span> <span class="var">age</span>
+
+<span class="kw">try</span><span class="op">:</span>
+    <span class="fn">set_age</span>(<span class="op">-</span><span class="nm">5</span>)
+<span class="kw">except</span> <span class="fn">NegativeAgeError</span> <span class="kw">as</span> <span class="var">e</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"Invalid age:"</span><span class="op">,</span> <span class="var">e</span>)
+
+<span class="cm"># Invalid age: Age cannot be negative</span></pre>
+    </div>
+    <div>
+      <h3>It Works Just Like a Built-in Exception</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">🎬</span>except NegativeAgeError catches only our custom error.</li>
+        <li><span class="icon">🎬</span>as e still lets us read the error message.</li>
+        <li><span class="icon">🎬</span>Other exceptions (like ValueError elsewhere) are left alone.</li>
+      </ul>
+      <div class="highlight-box" style="font-size:13px;">
+        📌 Custom exceptions make large programs much easier to debug — the exception name tells you exactly what broke.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">17 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 18 - MINI PROJECT: SAFE INPUT LOOP
+======================================== -->
+<div class="slide dark">
+  <h2 style="color:#fdba74; margin-bottom:14px;">Mini Project: A Safe Input Loop 🔒</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre style="font-size:12px;"><span class="kw">def</span> <span class="fn">get_positive_number</span>()<span class="op">:</span>
+    <span class="kw">while</span> <span class="ty">True</span><span class="op">:</span>
+        <span class="kw">try</span><span class="op">:</span>
+            <span class="var">value</span> <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"Enter a positive number: "</span>))
+            <span class="kw">if</span> <span class="var">value</span> <span class="op">&lt;=</span> <span class="nm">0</span><span class="op">:</span>
+                <span class="kw">raise</span> <span class="exc">ValueError</span>(<span class="st">"Number must be positive"</span>)
+        <span class="kw">except</span> <span class="exc">ValueError</span> <span class="kw">as</span> <span class="var">e</span><span class="op">:</span>
+            <span class="fn">print</span>(<span class="st">f"Invalid input: {e}"</span>)
+        <span class="kw">else</span><span class="op">:</span>
+            <span class="kw">return</span> <span class="var">value</span></pre>
+    </div>
+    <div>
+      <pre style="font-size:12px;"><span class="var">number</span> <span class="op">=</span> <span class="fn">get_positive_number</span>()
+<span class="fn">print</span>(<span class="st">f"You entered {number}"</span>)
+
+<span class="cm"># Enter a positive number: abc</span>
+<span class="cm"># Invalid input: invalid literal for int()...</span>
+<span class="cm"># Enter a positive number: -3</span>
+<span class="cm"># Invalid input: Number must be positive</span>
+<span class="cm"># Enter a positive number: 7</span>
+<span class="cm"># You entered 7</span></pre>
+      <div style="margin-top:12px; background:#1e293b; border-radius:10px; padding:10px 18px; font-size:13px; color:#fdba74; font-weight:600; border-left:3px solid #f97316;">
+        🔒 The loop keeps asking until the input is valid — one raise, one except, both bad-input cases handled.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">18 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 19 - COMMON MISTAKES
+======================================== -->
+<div class="slide content" style="padding:34px 54px;">
+  <h2 style="margin-bottom:12px;">Common Mistakes - Don't Fall For These! ⚠️</h2>
+  <div class="grid-2" style="gap:12px;">
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div class="card rose-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#be185d; margin-bottom:5px;">❌ Using a bare except: for everything</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#fef2f2; padding:7px; border-radius:6px; color:#991b1b;">
+          try: ...<br>
+          except: print("Something broke")<br>
+          # Hides typos and real bugs too! Name the exception.
+        </div>
+      </div>
+      <div class="card orange-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#ea580c; margin-bottom:5px;">❌ Putting only the safe code inside try</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#fff7ed; padding:7px; border-radius:6px; color:#9a3412;">
+          try:<br>
+          &nbsp;&nbsp;x = int(input())<br>
+          print(10 / x)  ← still crashes if x is 0!<br>
+          # Fix: put every risky line inside try.
+        </div>
+      </div>
+      <div class="card amber-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#d97706; margin-bottom:5px;">❌ Forgetting raise needs an exception</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#fffbeb; padding:7px; border-radius:6px; color:#92400e;">
+          raise "Age cannot be negative"  ← TypeError!<br>
+          raise ValueError("Age cannot be negative")  ← correct
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div class="card teal-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#0d9488; margin-bottom:5px;">❌ Confusing else with "the rest of the code"</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#f0fdfa; padding:7px; border-radius:6px; color:#134e4a;">
+          else only runs if try had NO exception at all.<br>
+          Code after the whole try/except runs either way.
+        </div>
+      </div>
+      <div class="card violet-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#6d28d9; margin-bottom:5px;">❌ Catching the wrong exception type</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#faf5ff; padding:7px; border-radius:6px; color:#4c1d95;">
+          except ZeroDivisionError: ← won't catch a ValueError!<br>
+          # Match the except type to the real error.
+        </div>
+      </div>
+      <div class="card blue-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#0284c7; margin-bottom:5px;">❌ Custom exception without inheriting Exception</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#eff6ff; padding:7px; border-radius:6px; color:#1d40af;">
+          class MyError: pass          ← not a real exception!<br>
+          class MyError(Exception): pass  ← correct
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-num">19 / 20</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 20 - SUMMARY
+======================================== -->
+<div class="slide hero" style="background: linear-gradient(135deg, #b91c1c 0%, #dc2626 40%, #ea580c 100%);">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="slide-tag">Python Crash Course - Day 11 Complete 🎓</div>
+  <div class="slide-title">Day 11 Done! 🏆</div>
+  <div class="slide-subtitle">Next: Building bigger, real-world Python programs</div>
+  <div style="margin-top:22px; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:560px; font-size:12px; font-weight:600; text-align:center;">
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">🛡️ try / except</div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">🎯 Specific Exceptions</div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">🔀 else &amp; finally</div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">🚨 raise</div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">🏷️ Custom Exceptions</div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">🔒 Safe Input Loops</div>
+  </div>
+  <div style="margin-top:24px; font-size:13px; opacity:0.75; font-weight:600; letter-spacing:1px;">
+    Keep building. Keep breaking. Keep learning. 🐍
+  </div>
+  <div class="page-num" style="color:white; opacity:0.4;">20 / 20</div>
+</div>
+
+
+<script>
+(function() {
+  const SLIDE_W = 1122;
+  const SLIDE_H = 794;
+  let presentMode = false;
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  let currentSlide = 0;
+
+  function updateScale() {
+    if (!presentMode) return;
+    const scale = Math.min(window.innerWidth / SLIDE_W, window.innerHeight / SLIDE_H);
+    document.documentElement.style.setProperty('--present-scale', scale);
+  }
+
+  function togglePresent() {
+    presentMode = !presentMode;
+    document.body.classList.toggle('present-mode', presentMode);
+    updateScale();
+    if (presentMode && slides[currentSlide]) {
+      slides[currentSlide].scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+  }
+
+  function scrollToSlide(index) {
+    if (index >= 0 && index < slides.length) {
+      slides[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      currentSlide = index;
+    }
+  }
+
+  window.addEventListener('resize', updateScale);
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (e.key === 'f' || e.key === 'F') {
+      e.preventDefault();
+      togglePresent();
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      scrollToSlide(currentSlide + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      scrollToSlide(currentSlide - 1);
+    }
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        currentSlide = slides.indexOf(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  slides.forEach(slide => observer.observe(slide));
+
+  const hint = document.createElement('div');
+  hint.className = 'controls-hint show';
+  hint.textContent = "Press 'F' for fullscreen mode - Arrow keys to navigate";
+  document.body.appendChild(hint);
+  setTimeout(() => hint.classList.remove('show'), 6000);
+})();
+</script>
+</body>
+</html>

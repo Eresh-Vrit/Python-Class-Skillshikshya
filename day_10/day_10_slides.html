@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 10: Encapsulation &amp; File Handling 🐍</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Fira+Code:wght@400;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    @page { size: A4 landscape; margin: 0; }
+
+    body { font-family: 'Poppins', 'Segoe UI', sans-serif; background: #e8e8e8; }
+
+    .slide {
+      width: 297mm;
+      height: 210mm;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      page-break-after: always;
+      break-after: page;
+    }
+    @media screen { .slide { margin: 20px auto; box-shadow: 0 8px 40px rgba(0,0,0,0.18); } }
+
+    .blob { position: absolute; border-radius: 50%; opacity: 0.15; pointer-events: none; }
+
+    /* -- Themes --- */
+    .hero {
+      background: linear-gradient(135deg, #0d9488 0%, #4f46e5 50%, #7c3aed 100%);
+      color: white; justify-content: center; align-items: center; text-align: center; padding: 60px;
+    }
+    .hero .blob1 { width: 300px; height: 300px; background: white; top: -90px; right: -70px; }
+    .hero .blob2 { width: 220px; height: 220px; background: #c4b5fd; bottom: -70px; left: -50px; }
+
+    .section-intro { background: white; flex-direction: row; }
+    .section-intro .panel {
+      width: 36%; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; padding: 50px 28px; color: white;
+    }
+    .section-intro .body { width: 64%; padding: 44px 52px; display: flex; flex-direction: column; justify-content: center; }
+
+    .content { background: white; padding: 48px 62px; }
+    .dark { background: #0f172a; color: #e2e8f0; padding: 46px 62px; }
+
+    /* -- Gradients --- */
+    .purple  { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .green   { background: linear-gradient(135deg, #059669, #10b981); }
+    .blue    { background: linear-gradient(135deg, #0284c7, #0ea5e9); }
+    .amber   { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .teal    { background: linear-gradient(135deg, #0d9488, #14b8a6); }
+    .violet  { background: linear-gradient(135deg, #6d28d9, #8b5cf6); }
+    .rose    { background: linear-gradient(135deg, #be185d, #e11d48); }
+    .indigo  { background: linear-gradient(135deg, #3730a3, #4f46e5); }
+    .orange  { background: linear-gradient(135deg, #c2410c, #ea580c); }
+    .fuchsia { background: linear-gradient(135deg, #86198f, #c026d3); }
+    .cyan    { background: linear-gradient(135deg, #0e7490, #06b6d4); }
+
+    /* -- Typography --- */
+    .slide-tag { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; opacity: 0.7; margin-bottom: 10px; }
+    .slide-title { font-size: 52px; font-weight: 900; line-height: 1.1; }
+    .slide-subtitle { font-size: 22px; font-weight: 400; opacity: 0.85; margin-top: 14px; }
+    .section-emoji { font-size: 88px; line-height: 1; margin-bottom: 14px; }
+    .section-label { font-size: 19px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+
+    h2 { font-size: 31px; font-weight: 800; color: #1e1b4b; margin-bottom: 20px; }
+    h3 { font-size: 20px; font-weight: 700; color: #1e1b4b; margin-bottom: 10px; }
+    .dark h2 { color: #e2e8f0; }
+    .dark h3 { color: #94a3b8; }
+
+    p { font-size: 16px; line-height: 1.65; color: #374151; }
+    .dark p { color: #cbd5e1; }
+
+    ul { list-style: none; margin-top: 6px; }
+    ul li { font-size: 16px; color: #374151; padding: 5px 0; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+    .dark ul li { color: #cbd5e1; }
+    ul li .icon { flex-shrink: 0; font-size: 17px; margin-top: 1px; }
+
+    /* -- Code --- */
+    pre {
+      background: #0f172a; border-radius: 12px; padding: 18px 22px;
+      font-family: 'Fira Code', 'Consolas', monospace; font-size: 14px;
+      line-height: 1.75; color: #e2e8f0; overflow: hidden;
+    }
+    .dark pre { background: #1e293b; }
+    pre .kw   { color: #c084fc; }
+    pre .fn   { color: #34d399; }
+    pre .st   { color: #fbbf24; }
+    pre .cm   { color: #64748b; }
+    pre .nm   { color: #38bdf8; }
+    pre .op   { color: #f472b6; }
+    pre .var  { color: #e2e8f0; }
+    pre .hl   { background: rgba(251,191,36,0.15); display: block; margin: 0 -22px; padding: 0 22px; }
+    pre .self { color: #fb923c; }
+    pre .dec  { color: #67e8f9; }
+
+    /* -- Layouts --- */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+    /* -- Cards --- */
+    .card { background: #f8fafc; border-radius: 14px; padding: 18px 22px; border-left: 5px solid #4f46e5; }
+    .card.green-border   { border-left-color: #059669; }
+    .card.blue-border    { border-left-color: #0284c7; }
+    .card.amber-border   { border-left-color: #d97706; }
+    .card.teal-border    { border-left-color: #0d9488; }
+    .card.violet-border  { border-left-color: #6d28d9; }
+    .card.rose-border    { border-left-color: #be185d; }
+    .card.indigo-border  { border-left-color: #4f46e5; }
+    .card.orange-border  { border-left-color: #ea580c; }
+    .card.purple-border  { border-left-color: #7c3aed; }
+    .card.fuchsia-border { border-left-color: #c026d3; }
+    .card.cyan-border    { border-left-color: #06b6d4; }
+
+    /* -- Pills --- */
+    .pill { display: inline-block; padding: 4px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .pill-green   { background: #d1fae5; color: #065f46; }
+    .pill-blue    { background: #dbeafe; color: #1e40af; }
+    .pill-amber   { background: #fef3c7; color: #92400e; }
+    .pill-teal    { background: #ccfbf1; color: #134e4a; }
+    .pill-violet  { background: #ede9fe; color: #4c1d95; }
+    .pill-rose    { background: #ffe4e6; color: #9f1239; }
+    .pill-orange  { background: #ffedd5; color: #9a3412; }
+    .pill-purple  { background: #f3e8ff; color: #6b21a8; }
+    .pill-indigo  { background: #e0e7ff; color: #3730a3; }
+    .pill-cyan    { background: #cffafe; color: #155e75; }
+
+    /* -- Highlight boxes --- */
+    .highlight-box {
+      background: #fef9c3; border: 2px solid #fde047; border-radius: 10px;
+      padding: 12px 18px; font-size: 15px; color: #713f12; margin-top: 16px; font-weight: 600;
+    }
+    .danger-box {
+      background: #fef2f2; border: 2px solid #fca5a5; border-radius: 10px;
+      padding: 12px 18px; font-size: 15px; color: #991b1b; margin-top: 16px; font-weight: 600;
+    }
+    .info-box {
+      background: #eff6ff; border: 2px solid #93c5fd; border-radius: 10px;
+      padding: 12px 18px; font-size: 15px; color: #1e40af; margin-top: 16px; font-weight: 600;
+    }
+    .success-box {
+      background: #f0fdf4; border: 2px solid #86efac; border-radius: 10px;
+      padding: 12px 18px; font-size: 15px; color: #14532d; margin-top: 16px; font-weight: 600;
+    }
+
+    /* -- Step trace --- */
+    .trace { font-family: 'Fira Code', monospace; font-size: 13px; background: #f1f5f9; border-radius: 10px; padding: 14px 18px; line-height: 2; }
+    .trace .step  { display: flex; gap: 14px; align-items: center; }
+    .trace .arrow { color: #0284c7; font-weight: 700; }
+    .trace .yes   { color: #059669; font-weight: 700; }
+    .trace .no    { color: #dc2626; font-weight: 700; }
+
+    /* -- Page number --- */
+    .page-num { position: absolute; bottom: 16px; right: 26px; font-size: 11px; font-weight: 600; opacity: 0.32; letter-spacing: 1px; }
+
+    /* -- Present mode --- */
+    :root { --present-scale: 1; }
+    body.present-mode {
+      background: #111;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    body.present-mode::-webkit-scrollbar { display: none; }
+    body.present-mode .slide {
+      transform: scale(var(--present-scale));
+      transform-origin: top center;
+      margin: 0 auto calc(794px * (var(--present-scale) - 1) + 40px * var(--present-scale));
+      box-shadow: none;
+      border-radius: 0;
+    }
+    body.present-mode .page-num { display: none; }
+
+    .controls-hint {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-family: 'Poppins', sans-serif;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .controls-hint.show { opacity: 1; }
+    body.present-mode .controls-hint { display: none; }
+  </style>
+</head>
+<body>
+
+
+<!-- ========================================
+  SLIDE 1 - TITLE
+======================================== -->
+<div class="slide hero">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="slide-tag">Python Crash Course - Day 10</div>
+  <div class="slide-title">Encapsulation &amp;<br>File Handling</div>
+  <div class="slide-subtitle">Protecting your data - Reading and writing files</div>
+  <div style="margin-top:30px; font-size:60px; line-height:1;">🔒📄</div>
+  <div style="margin-top:26px; font-size:12px; opacity:0.6; font-weight:600; letter-spacing:2px; text-transform:uppercase;">
+    Keep your class data safe, and save your program's data to disk.
+  </div>
+  <div class="page-num">1 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 2 - AGENDA
+======================================== -->
+<div class="slide content" style="padding:36px 56px;">
+  <h2 style="margin-bottom:12px;">Today's Roadmap 🗺️</h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:14px;">
+    <div class="card indigo-border">
+      <div style="font-size:28px; margin-bottom:6px;">🔒</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">Public, Protected, Private</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">Controlling who can see your class's data.</div>
+    </div>
+    <div class="card violet-border">
+      <div style="font-size:28px; margin-bottom:6px;">🔍</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">Getter Methods</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">Safe ways to read a private attribute's value.</div>
+    </div>
+    <div class="card purple-border">
+      <div style="font-size:28px; margin-bottom:6px;">✅</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">Setter Methods</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">Validate a value before changing a private attribute.</div>
+    </div>
+    <div class="card teal-border">
+      <div style="font-size:28px; margin-bottom:6px;">📂</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">Opening Files</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">open(), file modes, and the with statement.</div>
+    </div>
+    <div class="card blue-border">
+      <div style="font-size:28px; margin-bottom:6px;">📖</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">Reading Files</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">read(), readline(), readlines(), and looping.</div>
+    </div>
+    <div class="card amber-border">
+      <div style="font-size:28px; margin-bottom:6px;">✍️</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">Writing Files</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">write() and appending without erasing data.</div>
+    </div>
+    <div class="card rose-border">
+      <div style="font-size:28px; margin-bottom:6px;">🗑️</div>
+      <div style="font-weight:800; font-size:14px; color:#1e1b4b;">Deleting Files</div>
+      <div style="font-size:11px; color:#6b7280; margin-top:4px;">os.remove() and os.rmdir(), safely.</div>
+    </div>
+  </div>
+  <div class="highlight-box" style="font-size:13px; margin-top:12px;">
+    📌 Today has two parts: protecting data inside a class, then saving and cleaning up data outside your program.
+  </div>
+  <div class="page-num">2 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 3 - RECAP
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Quick Recap: Yesterday's OOP 🔙</h2>
+  <div class="grid-2" style="gap:24px;">
+    <div>
+      <h3>What We Covered on Day 9</h3>
+      <ul>
+        <li><span class="icon">✅</span>Class variables are shared by every object.</li>
+        <li><span class="icon">✅</span>Inheritance lets a child class reuse a parent's code.</li>
+        <li><span class="icon">✅</span>Abstract classes force children to implement methods.</li>
+        <li><span class="icon">✅</span>super() calls the parent's version of a method.</li>
+        <li><span class="icon">✅</span>Polymorphism: the same method name, many behaviors.</li>
+      </ul>
+      <div class="info-box" style="font-size:13px; margin-top:14px;">
+        💡 Today we ask a new question: how do we stop other code from messing up our object's data?
+      </div>
+    </div>
+    <div>
+      <pre><span class="kw">class</span> <span class="fn">Dog</span>(<span class="fn">Animal</span>)<span class="op">:</span>
+    <span class="kw">def</span> <span class="fn">speak</span>(<span class="self">self</span>)<span class="op">:</span>
+        <span class="fn">print</span>(<span class="st">"Woof!"</span>)
+
+<span class="var">dog</span> <span class="op">=</span> <span class="fn">Dog</span>(<span class="st">"Scooby"</span>)
+<span class="var">dog</span><span class="op">.</span><span class="fn">eat</span>()    <span class="cm"># inherited from Animal</span>
+<span class="var">dog</span><span class="op">.</span><span class="fn">speak</span>()  <span class="cm"># Woof!</span>
+
+<span class="cm"># Nothing stops us from doing this though...</span>
+<span class="var">dog</span><span class="op">.</span><span class="var">name</span> <span class="op">=</span> <span class="nm">12345</span>  <span class="cm"># uh oh, a name is now a number!</span></pre>
+    </div>
+  </div>
+  <div class="page-num">3 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 4 - SECTION INTRO: ENCAPSULATION
+======================================== -->
+<div class="slide section-intro">
+  <div class="panel indigo">
+    <div class="section-emoji">🔒</div>
+    <div class="section-label">Encapsulation</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">Bundle data and protect it from misuse.</div>
+  </div>
+  <div class="body">
+    <h2>The Big Idea</h2>
+    <p style="margin-bottom:14px;">Encapsulation means keeping an object's data <strong>bundled together</strong> with the methods that use it, and <strong>hiding the details</strong> other code should not touch directly.</p>
+    <ul style="margin-bottom:14px;">
+      <li><span class="icon">🔒</span>Attributes can be marked public, protected, or private.</li>
+      <li><span class="icon">🔒</span>Methods control how outside code reads or changes that data.</li>
+    </ul>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <div class="pill pill-indigo">hide the details</div>
+      <div class="pill pill-violet">protect the data</div>
+      <div class="pill pill-cyan">control access through methods</div>
+    </div>
+  </div>
+  <div class="page-num">4 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 5 - PUBLIC, PROTECTED, PRIVATE
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Public, Protected, and Private Attributes 🚦</h2>
+  <div class="grid-3" style="gap:16px;">
+    <div class="card green-border">
+      <h3 style="font-size:16px;">Public</h3>
+      <p style="font-size:13px; margin-bottom:8px;">name — no underscore. Anyone can read or change it freely.</p>
+      <pre style="font-size:12px;"><span class="self">self</span><span class="op">.</span><span class="var">name</span> <span class="op">=</span> <span class="var">name</span></pre>
+    </div>
+    <div class="card amber-border">
+      <h3 style="font-size:16px;">Protected</h3>
+      <p style="font-size:13px; margin-bottom:8px;">_name — one underscore. A hint: "internal use only," but Python does not enforce it.</p>
+      <pre style="font-size:12px;"><span class="self">self</span><span class="op">.</span><span class="var">_pin</span> <span class="op">=</span> <span class="var">pin</span></pre>
+    </div>
+    <div class="card rose-border">
+      <h3 style="font-size:16px;">Private</h3>
+      <p style="font-size:13px; margin-bottom:8px;">__name — two underscores. Python renames it so it is hard to access by accident.</p>
+      <pre style="font-size:12px;"><span class="self">self</span><span class="op">.</span><span class="var">__balance</span> <span class="op">=</span> <span class="var">balance</span></pre>
+    </div>
+  </div>
+  <div class="highlight-box" style="font-size:13px; margin-top:14px;">
+    📌 None of these truly "lock" the data in Python — they are increasingly strong signals of intent, not walls.
+  </div>
+  <div class="page-num">5 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 6 - NAME MANGLING
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Double Underscore and Name Mangling 🧪</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">class</span> <span class="fn">BankAccount</span><span class="op">:</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span><span class="op">,</span> <span class="var">owner</span><span class="op">:</span> <span class="ty">str</span><span class="op">,</span> <span class="var">balance</span><span class="op">:</span> <span class="ty">float</span>)<span class="op">:</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">owner</span> <span class="op">=</span> <span class="var">owner</span>          <span class="cm"># public</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">_pin</span> <span class="op">=</span> <span class="st">"1234"</span>       <span class="cm"># protected</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">__balance</span> <span class="op">=</span> <span class="var">balance</span>  <span class="cm"># private</span>
+
+<span class="var">account</span> <span class="op">=</span> <span class="fn">BankAccount</span>(<span class="st">"Sandy"</span><span class="op">,</span> <span class="nm">100</span>)
+
+<span class="fn">print</span>(<span class="var">account</span><span class="op">.</span><span class="var">owner</span>)     <span class="cm"># Sandy - fine</span>
+<span class="fn">print</span>(<span class="var">account</span><span class="op">.</span><span class="var">_pin</span>)      <span class="cm"># 1234 - allowed, but discouraged</span>
+<span class="fn">print</span>(<span class="var">account</span><span class="op">.</span><span class="var">__balance</span>)  <span class="cm"># AttributeError!</span></pre>
+    </div>
+    <div>
+      <h3>What Just Happened?</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">🧪</span>Python renames __balance to _BankAccount__balance behind the scenes.</li>
+        <li><span class="icon">🧪</span>account.__balance no longer exists under that exact name.</li>
+        <li><span class="icon">🧪</span>This is called <strong>name mangling</strong>.</li>
+      </ul>
+      <pre style="font-size:12px;"><span class="fn">print</span>(<span class="var">account</span><span class="op">.</span><span class="var">_BankAccount__balance</span>)  <span class="cm"># 100</span></pre>
+      <div class="info-box" style="font-size:13px; margin-top:10px;">
+        💡 You could still reach it this way, but you should not. Use methods instead, which we cover next.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">6 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 7 - GET PRIVATE PROPERTY VALUE
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Get Private Property Value: A Getter Method 🔍</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">class</span> <span class="fn">Person</span><span class="op">:</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span><span class="op">,</span> <span class="var">name</span><span class="op">,</span> <span class="var">age</span>)<span class="op">:</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">name</span> <span class="op">=</span> <span class="var">name</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">__age</span> <span class="op">=</span> <span class="var">age</span>
+
+    <span class="kw">def</span> <span class="fn">get_age</span>(<span class="self">self</span>)<span class="op">:</span>
+        <span class="kw">return</span> <span class="self">self</span><span class="op">.</span><span class="var">__age</span>
+
+<span class="var">p1</span> <span class="op">=</span> <span class="fn">Person</span>(<span class="st">"Tobias"</span><span class="op">,</span> <span class="nm">25</span>)
+<span class="fn">print</span>(<span class="var">p1</span><span class="op">.</span><span class="fn">get_age</span>())  <span class="cm"># 25</span></pre>
+    </div>
+    <div>
+      <h3>Why Not Just Use p1.__age?</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">🔍</span>__age is private, so p1.__age raises an AttributeError outside the class.</li>
+        <li><span class="icon">🔍</span>get_age() is a normal method that safely returns the value.</li>
+        <li><span class="icon">🔍</span>Any code outside the class must go through get_age() to read it.</li>
+      </ul>
+      <div class="info-box" style="font-size:13px;">
+        💡 This is called a "getter" method — its only job is to get (return) the value of a private attribute.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">7 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 8 - SET PRIVATE PROPERTY VALUE
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Set Private Property Value: A Setter Method ✍️</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">class</span> <span class="fn">Person</span><span class="op">:</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span><span class="op">,</span> <span class="var">name</span><span class="op">,</span> <span class="var">age</span>)<span class="op">:</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">name</span> <span class="op">=</span> <span class="var">name</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">__age</span> <span class="op">=</span> <span class="var">age</span>
+
+    <span class="kw">def</span> <span class="fn">get_age</span>(<span class="self">self</span>)<span class="op">:</span>
+        <span class="kw">return</span> <span class="self">self</span><span class="op">.</span><span class="var">__age</span>
+
+    <span class="kw">def</span> <span class="fn">set_age</span>(<span class="self">self</span><span class="op">,</span> <span class="var">age</span>)<span class="op">:</span>
+        <span class="kw">if</span> <span class="var">age</span> <span class="op">&gt;</span> <span class="nm">0</span><span class="op">:</span>
+            <span class="self">self</span><span class="op">.</span><span class="var">__age</span> <span class="op">=</span> <span class="var">age</span>
+        <span class="kw">else</span><span class="op">:</span>
+            <span class="fn">print</span>(<span class="st">"Age must be positive"</span>)</pre>
+    </div>
+    <div>
+      <pre><span class="var">p1</span> <span class="op">=</span> <span class="fn">Person</span>(<span class="st">"Tobias"</span><span class="op">,</span> <span class="nm">25</span>)
+<span class="fn">print</span>(<span class="var">p1</span><span class="op">.</span><span class="fn">get_age</span>())  <span class="cm"># 25</span>
+
+<span class="var">p1</span><span class="op">.</span><span class="fn">set_age</span>(<span class="nm">26</span>)
+<span class="fn">print</span>(<span class="var">p1</span><span class="op">.</span><span class="fn">get_age</span>())  <span class="cm"># 26</span>
+
+<span class="var">p1</span><span class="op">.</span><span class="fn">set_age</span>(<span class="op">-</span><span class="nm">5</span>)
+<span class="cm"># Age must be positive</span>
+<span class="fn">print</span>(<span class="var">p1</span><span class="op">.</span><span class="fn">get_age</span>())  <span class="cm"># still 26</span></pre>
+      <div class="success-box" style="font-size:13px; margin-top:12px;">
+        ✅ The setter checks the value first. An invalid age is rejected instead of being stored.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">8 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 9 - PUTTING IT TOGETHER: BANKACCOUNT
+======================================== -->
+<div class="slide dark">
+  <h2 style="color:#a5b4fc; margin-bottom:14px;">Putting It Together: A Safer BankAccount 🏦</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre style="font-size:12.5px;"><span class="kw">class</span> <span class="fn">BankAccount</span><span class="op">:</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span><span class="op">,</span> <span class="var">owner</span><span class="op">,</span> <span class="var">balance</span>)<span class="op">:</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">owner</span> <span class="op">=</span> <span class="var">owner</span>
+        <span class="self">self</span><span class="op">.</span><span class="var">__balance</span> <span class="op">=</span> <span class="var">balance</span>
+
+    <span class="kw">def</span> <span class="fn">get_balance</span>(<span class="self">self</span>)<span class="op">:</span>
+        <span class="kw">return</span> <span class="self">self</span><span class="op">.</span><span class="var">__balance</span>
+
+    <span class="kw">def</span> <span class="fn">set_balance</span>(<span class="self">self</span><span class="op">,</span> <span class="var">balance</span>)<span class="op">:</span>
+        <span class="kw">if</span> <span class="var">balance</span> <span class="op">&lt;</span> <span class="nm">0</span><span class="op">:</span>
+            <span class="fn">print</span>(<span class="st">"Balance cannot be negative!"</span>)
+        <span class="kw">else</span><span class="op">:</span>
+            <span class="self">self</span><span class="op">.</span><span class="var">__balance</span> <span class="op">=</span> <span class="var">balance</span></pre>
+    </div>
+    <div>
+      <pre style="font-size:12.5px;"><span class="var">account</span> <span class="op">=</span> <span class="fn">BankAccount</span>(<span class="st">"Sandy"</span><span class="op">,</span> <span class="nm">100</span>)
+
+<span class="fn">print</span>(<span class="var">account</span><span class="op">.</span><span class="fn">get_balance</span>())  <span class="cm"># 100</span>
+
+<span class="var">account</span><span class="op">.</span><span class="fn">set_balance</span>(<span class="nm">250</span>)
+<span class="fn">print</span>(<span class="var">account</span><span class="op">.</span><span class="fn">get_balance</span>())  <span class="cm"># 250</span>
+
+<span class="var">account</span><span class="op">.</span><span class="fn">set_balance</span>(<span class="op">-</span><span class="nm">50</span>)
+<span class="cm"># Balance cannot be negative!</span>
+<span class="fn">print</span>(<span class="var">account</span><span class="op">.</span><span class="fn">get_balance</span>())  <span class="cm"># still 250</span></pre>
+      <div style="margin-top:12px; background:#1e293b; border-radius:10px; padding:10px 18px; font-size:13px; color:#a5b4fc; font-weight:600; border-left:3px solid #6366f1;">
+        🔒 The balance can never become invalid, no matter what the outside code tries to set it to.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">9 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 10 - SECTION INTRO: FILE HANDLING
+======================================== -->
+<div class="slide section-intro">
+  <div class="panel teal">
+    <div class="section-emoji">📂</div>
+    <div class="section-label">File Handling</div>
+    <div style="font-size:13px; margin-top:8px; opacity:0.85; text-align:center;">Save your program's data to disk.</div>
+  </div>
+  <div class="body">
+    <h2>The Big Idea</h2>
+    <p style="margin-bottom:14px;">So far, all our data disappears when the program ends. <strong>File handling</strong> lets Python read data from files and write data to files, so it survives between runs.</p>
+    <ul style="margin-bottom:14px;">
+      <li><span class="icon">📂</span>open() opens a file so Python can work with it.</li>
+      <li><span class="icon">📂</span>Files must eventually be closed when you are done.</li>
+    </ul>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <div class="pill pill-teal">read data</div>
+      <div class="pill pill-green">write data</div>
+      <div class="pill pill-cyan">data survives after the program ends</div>
+    </div>
+  </div>
+  <div class="page-num">10 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 11 - OPENING FILES & MODES
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Opening Files: open() and File Modes 🔑</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="var">file</span> <span class="op">=</span> <span class="fn">open</span>(<span class="st">"notes.txt"</span><span class="op">,</span> <span class="st">"r"</span>)
+<span class="var">content</span> <span class="op">=</span> <span class="var">file</span><span class="op">.</span><span class="fn">read</span>()
+<span class="fn">print</span>(<span class="var">content</span>)
+<span class="var">file</span><span class="op">.</span><span class="fn">close</span>()  <span class="cm"># must close it yourself!</span></pre>
+      <div class="danger-box" style="font-size:13px; margin-top:12px;">
+        ⚠️ If you forget file.close(), the file may stay locked or changes may not be saved properly.
+      </div>
+    </div>
+    <div>
+      <h3>Common File Modes</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">📖</span><strong>"r"</strong> — read only. File must already exist.</li>
+        <li><span class="icon">✍️</span><strong>"w"</strong> — write. Creates the file, erases existing content.</li>
+        <li><span class="icon">➕</span><strong>"a"</strong> — append. Adds to the end, keeps old content.</li>
+        <li><span class="icon">🔁</span><strong>"r+"</strong> — read and write, without erasing.</li>
+      </ul>
+      <div class="info-box" style="font-size:13px;">
+        💡 open(filename, mode) is the same idea for every mode — only the mode letter changes what happens.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">11 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 12 - THE WITH STATEMENT
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">The with Statement: Closing Files Automatically 🤝</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div class="card rose-border">
+      <h3 style="font-size:16px;">Without with</h3>
+      <pre style="font-size:12px;"><span class="var">file</span> <span class="op">=</span> <span class="fn">open</span>(<span class="st">"notes.txt"</span><span class="op">,</span> <span class="st">"r"</span>)
+<span class="var">content</span> <span class="op">=</span> <span class="var">file</span><span class="op">.</span><span class="fn">read</span>()
+<span class="var">file</span><span class="op">.</span><span class="fn">close</span>()  <span class="cm"># easy to forget!</span></pre>
+      <p style="font-size:13px; margin-top:8px;">If an error happens before close(), the file may never close.</p>
+    </div>
+    <div class="card teal-border">
+      <h3 style="font-size:16px;">With with</h3>
+      <pre style="font-size:12px;"><span class="kw">with</span> <span class="fn">open</span>(<span class="st">"notes.txt"</span><span class="op">,</span> <span class="st">"r"</span>) <span class="kw">as</span> <span class="var">file</span><span class="op">:</span>
+    <span class="var">content</span> <span class="op">=</span> <span class="var">file</span><span class="op">.</span><span class="fn">read</span>()
+<span class="cm"># file is automatically closed here</span>
+
+<span class="fn">print</span>(<span class="var">content</span>)</pre>
+      <p style="font-size:13px; margin-top:8px;">Python closes the file for you, even if an error occurs inside the block.</p>
+    </div>
+  </div>
+  <div class="success-box" style="font-size:13px; margin-top:12px;">
+    ✅ Always prefer the with statement. It is shorter and safer than calling open() and close() yourself.
+  </div>
+  <div class="page-num">12 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 13 - READING FILES
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Reading Files: read(), readline(), readlines() 📖</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="cm"># notes.txt contains:</span>
+<span class="cm"># Hello, SpongeBob!</span>
+<span class="cm"># Welcome to Bikini Bottom.</span>
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"notes.txt"</span><span class="op">,</span> <span class="st">"r"</span>) <span class="kw">as</span> <span class="var">file</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="var">file</span><span class="op">.</span><span class="fn">read</span>())
+<span class="cm"># whole file as ONE string</span>
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"notes.txt"</span><span class="op">,</span> <span class="st">"r"</span>) <span class="kw">as</span> <span class="var">file</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="var">file</span><span class="op">.</span><span class="fn">readline</span>())
+<span class="cm"># just the FIRST line: "Hello, SpongeBob!"</span></pre>
+    </div>
+    <div>
+      <pre><span class="kw">with</span> <span class="fn">open</span>(<span class="st">"notes.txt"</span><span class="op">,</span> <span class="st">"r"</span>) <span class="kw">as</span> <span class="var">file</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="var">file</span><span class="op">.</span><span class="fn">readlines</span>())
+<span class="cm"># a LIST of lines:</span>
+<span class="cm"># ['Hello, SpongeBob!\n', 'Welcome to Bikini Bottom.\n']</span></pre>
+      <h3 style="margin-top:14px;">Which One Should I Use?</h3>
+      <ul>
+        <li><span class="icon">📖</span>read() — when you want everything at once.</li>
+        <li><span class="icon">📖</span>readline() — when you only need one line.</li>
+        <li><span class="icon">📖</span>readlines() — when you want each line as a list item.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="page-num">13 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 14 - LOOPING OVER A FILE
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Looping Over a File Line by Line 🔁</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">with</span> <span class="fn">open</span>(<span class="st">"notes.txt"</span><span class="op">,</span> <span class="st">"r"</span>) <span class="kw">as</span> <span class="var">file</span><span class="op">:</span>
+    <span class="kw">for</span> <span class="var">line</span> <span class="kw">in</span> <span class="var">file</span><span class="op">:</span>
+        <span class="fn">print</span>(<span class="var">line</span><span class="op">.</span><span class="fn">strip</span>())
+
+<span class="cm"># Hello, SpongeBob!</span>
+<span class="cm"># Welcome to Bikini Bottom.</span></pre>
+    </div>
+    <div>
+      <h3>What is Happening?</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">🔁</span>A file can be looped over directly, one line at a time.</li>
+        <li><span class="icon">🔁</span>Each line includes a trailing newline character "\n".</li>
+        <li><span class="icon">🔁</span>.strip() removes that extra newline for clean printing.</li>
+      </ul>
+      <div class="highlight-box" style="font-size:13px;">
+        📌 This is the most memory-friendly way to process a large file — Python reads one line at a time.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">14 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 15 - WRITING TO FILES
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Writing to Files: Mode "w" ✍️</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">with</span> <span class="fn">open</span>(<span class="st">"notes.txt"</span><span class="op">,</span> <span class="st">"w"</span>) <span class="kw">as</span> <span class="var">file</span><span class="op">:</span>
+    <span class="var">file</span><span class="op">.</span><span class="fn">write</span>(<span class="st">"Hello, SpongeBob!\n"</span>)
+    <span class="var">file</span><span class="op">.</span><span class="fn">write</span>(<span class="st">"Welcome to Bikini Bottom.\n"</span>)
+
+<span class="cm"># notes.txt now contains exactly those two lines.</span>
+<span class="cm"># Anything that was in the file before is GONE.</span></pre>
+    </div>
+    <div>
+      <h3>Key Points About "w" Mode</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">✍️</span>Creates the file if it does not exist yet.</li>
+        <li><span class="icon">✍️</span>Erases all existing content before writing.</li>
+        <li><span class="icon">✍️</span>write() does not add a newline automatically — add \n yourself.</li>
+      </ul>
+      <div class="danger-box" style="font-size:13px;">
+        ⚠️ Opening a file in "w" mode wipes it immediately, even if you never call write() afterward.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">15 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 16 - APPENDING TO FILES
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Appending to Files: Mode "a" ➕</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="kw">with</span> <span class="fn">open</span>(<span class="st">"notes.txt"</span><span class="op">,</span> <span class="st">"a"</span>) <span class="kw">as</span> <span class="var">file</span><span class="op">:</span>
+    <span class="var">file</span><span class="op">.</span><span class="fn">write</span>(<span class="st">"See you tomorrow!\n"</span>)
+
+<span class="cm"># notes.txt now contains:</span>
+<span class="cm"># Hello, SpongeBob!</span>
+<span class="cm"># Welcome to Bikini Bottom.</span>
+<span class="cm"># See you tomorrow!</span></pre>
+    </div>
+    <div>
+      <h3>"w" vs "a" — Do Not Mix Them Up!</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">✍️</span>"w" — overwrites the whole file. Old data is lost.</li>
+        <li><span class="icon">➕</span>"a" — adds to the end. Old data stays safe.</li>
+      </ul>
+      <div class="success-box" style="font-size:13px;">
+        ✅ Use "a" for things like logs or diaries, where you want to keep adding entries over time.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">16 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 17 - "r+" MODE
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">"r+" Mode: Read and Write Together 🔁</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="cm"># notes.txt already contains:</span>
+<span class="cm"># Hello, SpongeBob!</span>
+<span class="cm"># Welcome to Bikini Bottom.</span>
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"notes.txt"</span><span class="op">,</span> <span class="st">"r+"</span>) <span class="kw">as</span> <span class="var">file</span><span class="op">:</span>
+    <span class="var">content</span> <span class="op">=</span> <span class="var">file</span><span class="op">.</span><span class="fn">read</span>()   <span class="cm"># read what is already there</span>
+    <span class="fn">print</span>(<span class="var">content</span>)
+    <span class="var">file</span><span class="op">.</span><span class="fn">write</span>(<span class="st">"Patrick was here!\n"</span>)  <span class="cm"># then write more</span>
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"notes.txt"</span><span class="op">,</span> <span class="st">"r"</span>) <span class="kw">as</span> <span class="var">file</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="var">file</span><span class="op">.</span><span class="fn">read</span>())
+<span class="cm"># Hello, SpongeBob!</span>
+<span class="cm"># Welcome to Bikini Bottom.</span>
+<span class="cm"># Patrick was here!</span></pre>
+    </div>
+    <div>
+      <h3>"r+" — Both Read and Write, No Erasing</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">🔁</span>Unlike "w", opening with "r+" does <strong>not</strong> erase the file.</li>
+        <li><span class="icon">🔁</span>You can call both read() and write() on the same file object.</li>
+        <li><span class="icon">🔁</span>Writing happens from the current position — after file.read(), that position is the end of the file.</li>
+      </ul>
+      <div class="danger-box" style="font-size:13px;">
+        ⚠️ Like "r", the file must already exist — "r+" cannot create a new file. Use "w" or "a" for that.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">17 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 18 - writelines() AND MULTIPLE LINES
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Writing Multiple Lines with writelines() 📝</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre><span class="var">lines</span> <span class="op">=</span> [
+    <span class="st">"Hello, SpongeBob!\n"</span><span class="op">,</span>
+    <span class="st">"Welcome to Bikini Bottom.\n"</span><span class="op">,</span>
+    <span class="st">"See you tomorrow!\n"</span>
+]
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"notes.txt"</span><span class="op">,</span> <span class="st">"w"</span>) <span class="kw">as</span> <span class="var">file</span><span class="op">:</span>
+    <span class="var">file</span><span class="op">.</span><span class="fn">writelines</span>(<span class="var">lines</span>)</pre>
+    </div>
+    <div>
+      <h3>write() vs writelines()</h3>
+      <ul style="margin-bottom:14px;">
+        <li><span class="icon">✍️</span>write() takes one string.</li>
+        <li><span class="icon">📝</span>writelines() takes a list of strings.</li>
+        <li><span class="icon">📝</span>Neither one adds \n for you — put it in each string yourself.</li>
+      </ul>
+      <div class="info-box" style="font-size:13px;">
+        💡 writelines() does not add blank lines between items — that is why each string in the list ends with \n.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">18 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 19 - MINI PROJECT: DIARY
+======================================== -->
+<div class="slide dark">
+  <h2 style="color:#5eead4; margin-bottom:14px;">Mini Project: A Simple Diary Program 📔</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div>
+      <pre style="font-size:12.5px;"><span class="kw">def</span> <span class="fn">add_entry</span>(<span class="var">text</span><span class="op">:</span> <span class="ty">str</span>) <span class="op">-&gt;</span> <span class="ty">None</span><span class="op">:</span>
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="st">"diary.txt"</span><span class="op">,</span> <span class="st">"a"</span>) <span class="kw">as</span> <span class="var">file</span><span class="op">:</span>
+        <span class="var">file</span><span class="op">.</span><span class="fn">write</span>(<span class="var">text</span> <span class="op">+</span> <span class="st">"\n"</span>)
+
+<span class="kw">def</span> <span class="fn">show_diary</span>() <span class="op">-&gt;</span> <span class="ty">None</span><span class="op">:</span>
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="st">"diary.txt"</span><span class="op">,</span> <span class="st">"r"</span>) <span class="kw">as</span> <span class="var">file</span><span class="op">:</span>
+        <span class="kw">for</span> <span class="var">line</span> <span class="kw">in</span> <span class="var">file</span><span class="op">:</span>
+            <span class="fn">print</span>(<span class="st">"-"</span><span class="op">,</span> <span class="var">line</span><span class="op">.</span><span class="fn">strip</span>())</pre>
+    </div>
+    <div>
+      <pre style="font-size:12.5px;"><span class="fn">add_entry</span>(<span class="st">"Today I learned file handling!"</span>)
+<span class="fn">add_entry</span>(<span class="st">"Encapsulation makes my code safer."</span>)
+
+<span class="fn">show_diary</span>()
+<span class="cm"># - Today I learned file handling!</span>
+<span class="cm"># - Encapsulation makes my code safer.</span></pre>
+      <div style="margin-top:12px; background:#1e293b; border-radius:10px; padding:10px 18px; font-size:13px; color:#5eead4; font-weight:600; border-left:3px solid #14b8a6;">
+        📔 add_entry() appends, so running the program again keeps every past entry instead of erasing them.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">19 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 20 - DELETING FILES AND FOLDERS
+======================================== -->
+<div class="slide content" style="padding:38px 58px;">
+  <h2 style="margin-bottom:14px;">Deleting Files and Folders 🗑️</h2>
+  <div class="grid-2" style="gap:22px;">
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="card rose-border">
+        <h3 style="font-size:16px;">Delete a File</h3>
+        <p style="font-size:13px; margin-bottom:8px;">Import the os module, then call os.remove().</p>
+        <pre style="font-size:12px;"><span class="kw">import</span> <span class="var">os</span>
+
+<span class="var">os</span><span class="op">.</span><span class="fn">remove</span>(<span class="st">"demofile.txt"</span>)</pre>
+      </div>
+      <div class="card teal-border">
+        <h3 style="font-size:16px;">Check Before You Delete</h3>
+        <p style="font-size:13px; margin-bottom:8px;">Avoid an error by checking the file exists first.</p>
+        <pre style="font-size:12px;"><span class="kw">import</span> <span class="var">os</span>
+
+<span class="kw">if</span> <span class="var">os</span><span class="op">.</span><span class="var">path</span><span class="op">.</span><span class="fn">exists</span>(<span class="st">"demofile.txt"</span>)<span class="op">:</span>
+    <span class="var">os</span><span class="op">.</span><span class="fn">remove</span>(<span class="st">"demofile.txt"</span>)
+<span class="kw">else</span><span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">"The file does not exist"</span>)</pre>
+      </div>
+    </div>
+    <div>
+      <div class="card indigo-border">
+        <h3 style="font-size:16px;">Delete a Folder</h3>
+        <p style="font-size:13px; margin-bottom:8px;">Use os.rmdir() to remove an entire folder.</p>
+        <pre style="font-size:12px;"><span class="kw">import</span> <span class="var">os</span>
+
+<span class="var">os</span><span class="op">.</span><span class="fn">rmdir</span>(<span class="st">"myfolder"</span>)</pre>
+      </div>
+      <h3 style="margin-top:16px;">Key Points</h3>
+      <ul style="margin-bottom:10px;">
+        <li><span class="icon">🗑️</span>Deleting always needs import os first.</li>
+        <li><span class="icon">🗑️</span>os.remove() on a missing file raises FileNotFoundError.</li>
+        <li><span class="icon">🗑️</span>os.path.exists() lets you check safely before deleting.</li>
+        <li><span class="icon">🗑️</span>os.rmdir() only works on an empty folder.</li>
+      </ul>
+      <div class="danger-box" style="font-size:13px;">
+        ⚠️ Deleting is permanent — there is no undo and no trash bin. Always double-check the filename first.
+      </div>
+    </div>
+  </div>
+  <div class="page-num">20 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 21 - COMMON MISTAKES
+======================================== -->
+<div class="slide content" style="padding:34px 54px;">
+  <h2 style="margin-bottom:12px;">Common Mistakes - Don't Fall For These! ⚠️</h2>
+  <div class="grid-2" style="gap:12px;">
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div class="card rose-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#be185d; margin-bottom:5px;">❌ Thinking __balance is truly private</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#fef2f2; padding:7px; border-radius:6px; color:#991b1b;">
+          account.__balance          ← AttributeError<br>
+          account._BankAccount__balance  ← still reachable!<br>
+          # Name mangling is a strong hint, not a lock.
+        </div>
+      </div>
+      <div class="card orange-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#ea580c; margin-bottom:5px;">❌ Forgetting the parentheses when calling a method</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#fff7ed; padding:7px; border-radius:6px; color:#9a3412;">
+          print(p1.get_age)    ← prints a method object!<br>
+          print(p1.get_age())  ← correct, prints 25
+        </div>
+      </div>
+      <div class="card amber-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#d97706; margin-bottom:5px;">❌ Opening in "w" mode when you meant "a"</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#fffbeb; padding:7px; border-radius:6px; color:#92400e;">
+          open("diary.txt", "w")  ← erases old entries!<br>
+          open("diary.txt", "a")  ← adds a new entry safely
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div class="card teal-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#0d9488; margin-bottom:5px;">❌ Forgetting to close a file</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#f0fdfa; padding:7px; border-radius:6px; color:#134e4a;">
+          file = open("notes.txt")<br>
+          ... forgot file.close() ...<br>
+          # Fix: use "with open(...) as file:" instead
+        </div>
+      </div>
+      <div class="card violet-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#6d28d9; margin-bottom:5px;">❌ Reading a file that does not exist</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#faf5ff; padding:7px; border-radius:6px; color:#4c1d95;">
+          open("missing.txt", "r")  ← FileNotFoundError<br>
+          # "r" mode needs the file to already exist.
+        </div>
+      </div>
+      <div class="card blue-border" style="padding:10px 14px;">
+        <div style="font-size:12px; font-weight:700; color:#0284c7; margin-bottom:5px;">❌ Forgetting "\n" when writing lines</div>
+        <div style="font-family:'Fira Code',monospace; font-size:11px; background:#eff6ff; padding:7px; border-radius:6px; color:#1d40af;">
+          file.write("Hello")<br>
+          file.write("World")<br>
+          # Result: "HelloWorld" all on one line!
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-num">21 / 22</div>
+</div>
+
+
+<!-- ========================================
+  SLIDE 22 - SUMMARY
+======================================== -->
+<div class="slide hero" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 40%, #0d9488 100%);">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="slide-tag">Python Crash Course - Day 10 Complete 🎓</div>
+  <div class="slide-title">Day 10 Done! 🏆</div>
+  <div class="slide-subtitle">Next: Building bigger, real-world Python programs</div>
+  <div style="margin-top:22px; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:560px; font-size:12px; font-weight:600; text-align:center;">
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">🔒 Public / Protected / Private</div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">🔍 Getter Methods</div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">✅ Setter Methods</div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">📂 open() &amp; with</div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">📖 Reading Files</div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">✍️ Writing &amp; Appending</div>
+    <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:10px 8px;">🗑️ Deleting Files &amp; Folders</div>
+  </div>
+  <div style="margin-top:24px; font-size:13px; opacity:0.75; font-weight:600; letter-spacing:1px;">
+    Keep building. Keep breaking. Keep learning. 🐍
+  </div>
+  <div class="page-num" style="color:white; opacity:0.4;">22 / 22</div>
+</div>
+
+
+<script>
+(function() {
+  const SLIDE_W = 1122;
+  const SLIDE_H = 794;
+  let presentMode = false;
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  let currentSlide = 0;
+
+  function updateScale() {
+    if (!presentMode) return;
+    const scale = Math.min(window.innerWidth / SLIDE_W, window.innerHeight / SLIDE_H);
+    document.documentElement.style.setProperty('--present-scale', scale);
+  }
+
+  function togglePresent() {
+    presentMode = !presentMode;
+    document.body.classList.toggle('present-mode', presentMode);
+    updateScale();
+    if (presentMode && slides[currentSlide]) {
+      slides[currentSlide].scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+  }
+
+  function scrollToSlide(index) {
+    if (index >= 0 && index < slides.length) {
+      slides[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      currentSlide = index;
+    }
+  }
+
+  window.addEventListener('resize', updateScale);
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (e.key === 'f' || e.key === 'F') {
+      e.preventDefault();
+      togglePresent();
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      scrollToSlide(currentSlide + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      scrollToSlide(currentSlide - 1);
+    }
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        currentSlide = slides.indexOf(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  slides.forEach(slide => observer.observe(slide));
+
+  const hint = document.createElement('div');
+  hint.className = 'controls-hint show';
+  hint.textContent = "Press 'F' for fullscreen mode - Arrow keys to navigate";
+  document.body.appendChild(hint);
+  setTimeout(() => hint.classList.remove('show'), 6000);
+})();
+</script>
+</body>
+</html>
